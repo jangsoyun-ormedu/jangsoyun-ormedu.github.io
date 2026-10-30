@@ -1,0 +1,64 @@
+/* =========================================================
+   오름에듀테크 v3 — 모션 레이어
+
+   스크롤에 물린 것(핀, 폴라로이드, 프로세스 단계, 스냅)은 전부 GSAP ScrollTrigger 가
+   app.js 에서 좌표를 직접 쓴다. 여기에는 스크롤과 무관한 선언형 모션만 둔다.
+   ========================================================= */
+
+/* ---- 등장 리빌 ----
+   html.motion 은 index.html 헤드에서 붙인다 (IntersectionObserver 지원 +
+   '동작 줄이기' 미설정일 때만). 그래서 이 블록 자체가 안전장치 역할을 한다.
+   섹션이 화면에 들어오면 app.js 가 그 안의 [data-reveal] 에 --d 를 매겨 차례로 켠다. */
+html.motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity 900ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms),
+              transform 900ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms);
+}
+html.motion [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- WHAT WE DO 카드 첫 등장 — 왼쪽부터 하나씩 차오른다 ----
+   섹션이 처음 화면에 들어오기 전까지 app.js 가 스트립에 [data-intro] 를 걸어 두고,
+   카드마다 --intro-d(순번 × 간격)를 매긴다. 들어오는 순간 속성을 떼면 카드가 왼쪽 것부터
+   차례로 투명 → 제 투명도(접힌 카드 .85 / 나머지 1)로 차오른다.
+   !important 인 이유: app.js applyGeometry 가 카드 opacity 를 인라인으로 쓴다.
+   트랜지션 정의는 styles.css .panel — 펼침 트랜지션과 한 줄에 있어야 서로 덮어쓰지 않는다. */
+html.motion .biz__strip[data-intro] .panel { opacity: 0 !important; }
+
+/* ---- 로고 마키 (3줄) ----
+   각 줄은 항목을 2배로 복제해 두고 -50% 까지 흘린 뒤 되감는다. 가운데 줄만 반대 방향.
+   속도는 디자인의 marqueeSpeed 0.5× 기준 = [35, 44, 39] ÷ 0.5. */
+@keyframes om-marquee-left  { from { transform: translateX(0);    } to { transform: translateX(-50%); } }
+@keyframes om-marquee-right { from { transform: translateX(-50%); } to { transform: translateX(0);    } }
+
+.marquee__row:nth-child(1) .marquee__track { animation: om-marquee-left  70s linear infinite; }
+.marquee__row:nth-child(2) .marquee__track { animation: om-marquee-right 88s linear infinite; }
+.marquee__row:nth-child(3) .marquee__track { animation: om-marquee-left  78s linear infinite; }
+.marquee__track:hover { animation-play-state: paused; }
+
+/* NOW RUNNING 의 오도미터는 선언형 애니메이션이 아니다 — app.js 가 매 프레임
+   릴의 translateY 를 직접 계산해 넣는다. 구조는 styles.css 의 .odo 참고. */
+
+/* ---- 동작 줄이기 ----
+   리빌은 html.motion 이 안 붙어 이미 꺼진다. 자동 재생되는 것만 추가로 멈춘다.
+   핀 구간의 카드 이동은 스크롤에 1:1로 묶여 있어 그대로 둔다 —
+   멈추면 카드가 화면에 들어오지 못한다. 관성 스크롤과 스냅은 app.js 에서 끈다. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .marquee__track { animation: none; }
+  /* 히어로는 app.js 가 첫 장만 띄우고 타이머를 걸지 않는다. 확대도 남지 않게 지운다. */
+  .hero__slide { transition: none; transform: none; }
+  .hero__slide--flip { transform: scaleX(-1); }
+  .panel,
+  .panel__bg,
+  .panel__active,
+  .panel__neighbor,
+  .panel__folded,
+  .proc__bar,
+  .step,
+  .step__no,
+  .hdr { transition: none; }
+}

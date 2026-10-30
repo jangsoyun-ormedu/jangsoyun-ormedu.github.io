@@ -1,0 +1,859 @@
+/* =========================================================
+   오름에듀테크 v3 — Full-Page Snap & Pin System
+   디자인 원본: zipfiles/004.zip · untitled/project/오름에듀테크 v3.dc.html
+   (푸터·CONTACT 는 003, 히어로·ON SITE 는 004 기준)
+
+   스크롤 체계는 하나가 관장한다: Lenis(관성) + GSAP ScrollTrigger(핀·스냅).
+   CSS scroll-snap 은 쓰지 않는다 — ScrollTrigger 의 핀과 같은 스크롤 위치를
+   동시에 잡아당겨서 떨림이 생긴다. 스냅은 전부 app.js 쪽에 있다.
+   ========================================================= */
+
+:root {
+  --ink:    #15171a;
+  --teal:   #00908c;
+  --mint:   #4fded8;
+  --dark:   #0d0f11;
+  --muted:  #55585f;
+  --gray:   #8b8e95;
+  --line:   #ececea;
+  --maxw:   1400px;
+  --gutter: clamp(20px, 4vw, 56px);
+  --hdr-h:  68px;         /* 네 페이지 공통. 디자인 원본이 모두 68px 이다 */
+}
+/* 2026-10-30: PC 상단 GNB 20% 키움 — 높이 68 → 82px, 로고 24 → 29px, 메뉴 글자 15 → 18px, 간격 22 → 26px.
+   휴대폰(759.98px 이하)은 따로 정한 값(84px 헤더·전체 화면 메뉴)을 그대로 쓴다 */
+@media (min-width: 760px) { :root { --hdr-h: 82px; } }
+
+html {
+  /* Lenis 가 붙으면 아래 .lenis-smooth 규칙이 auto 로 덮는다. JS 실패 시의 대비책. */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Lenis 권장 스타일 */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+a { color: var(--ink); text-decoration: none; }
+a:hover { color: var(--teal); }
+::selection { background: #c9f2f0; }
+img { border-style: none; }
+
+[data-rail] { scrollbar-width: none; }
+[data-rail]::-webkit-scrollbar { display: none; }
+
+
+/* =========================================================
+   화면 규격 — 모든 섹션은 정확히 한 화면, 내용은 세로 중앙
+   ========================================================= */
+
+/* 자식 결합자(body >)를 쓰면 안 된다. ScrollTrigger 가 핀 섹션을 .pin-spacer 로
+   감싸는 순간 body 의 직계 자식이 아니게 되어 규격이 통째로 풀린다.
+   중첩된 section/footer 가 없으므로 요소 선택자로 충분하다. */
+section,
+footer {
+  position: relative;
+  box-sizing: border-box;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* 내용 래퍼. max-height 85dvh 가 "한 화면을 넘지 않는다"의 상한선이고,
+   아래 각 섹션의 세로 여백은 dvh 기반 clamp 라 화면이 낮아지면 같이 줄어든다. */
+.wrap {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;          /* 플렉스 아이템이라 긴 내용에 밀리지 않게 */
+  max-width: var(--maxw);
+  max-height: 85dvh;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.eyebrow { margin: 0; font-size: 13px; font-weight: 700; color: var(--teal); }
+.eyebrow--mint { color: var(--mint); }
+
+
+/* ============ 헤더 ============ */
+
+.hdr {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 80;
+  border-bottom: 1px solid transparent;
+  transition: transform .3s cubic-bezier(.2,.7,.2,1), background .35s ease,
+              border-color .35s ease, backdrop-filter .35s ease;
+}
+/* 본문 래퍼(.wrap)와 같은 규격 — 로고 왼쪽 끝이 본문 왼쪽 끝과 맞는다.
+   디자인 원본은 헤더만 1280px 로 좁게 잡지만, 그러면 네비가 본문보다 안쪽으로 들어간다. */
+.hdr__inner {
+  box-sizing: border-box;
+  max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter);
+  height: var(--hdr-h);
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.hdr__brand { display: flex; align-items: center; flex-shrink: 0; color: #fff; transition: color .35s ease; }
+.hdr__brand img { height: 29px; width: auto; display: block; filter: brightness(0) invert(1); transition: filter .35s ease; }
+/* 항목이 4개뿐이라 넘치지 않는다 — 가로 스크롤(data-rail)도 flex 신축도 필요 없다 */
+.hdr__nav {
+  display: flex; align-items: center; gap: 26px;
+  color: #fff; transition: color .35s ease;
+}
+.hdr__nav a {
+  color: inherit; font-size: 18px; font-weight: 600;
+  opacity: .62; transition: opacity .2s ease;
+}
+.hdr__nav a:hover { opacity: 1; color: inherit; }
+/* 지금 보고 있는 페이지 */
+.hdr__nav a.is-current { font-weight: 700; opacity: 1; }
+
+/* 네 페이지 공통값 — 불투명도 80% + 블러 20px */
+.hdr.is-solid { background: rgba(255,255,255,.8); backdrop-filter: blur(20px); border-bottom-color: var(--line); }
+.hdr.is-solid .hdr__brand,
+.hdr.is-solid .hdr__nav { color: var(--ink); }
+.hdr.is-solid .hdr__brand img { filter: none; }
+.hdr.is-hidden { transform: translateY(-100%); }
+
+/* 메뉴 버튼 — 넓은 화면에서는 쓰지 않는다. 좁은 화면 규칙은 아래 '좁은 화면' 블록에 */
+.hdr__menu { display: none; }
+
+
+/* ============ 히어로 ============ */
+
+/* 카피는 화면 아래에 붙는다 — 기본 규격의 align-items:center 를 flex-end 로 뒤집고
+   아래 여백만 래퍼가 직접 갖는다. 사진은 위쪽 절반을 그대로 보여 준다. */
+.hero {
+  align-items: flex-end;
+  background: var(--dark);
+}
+.hero__slides { position: absolute; inset: 0; }
+.hero__slide {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  opacity: 0; will-change: opacity, transform;
+}
+/* 첫 장만 좌우 반전. app.js 가 transform 을 덮어쓰므로 여기서는 표시용 초기값만 잡는다 */
+.hero__slide--flip { transform: scaleX(-1); }
+/* JS 가 멎어도 첫 장은 보이게 — 디자인의 활성 투명도 0.62 */
+.hero__slides > .hero__slide:first-child { opacity: .62; }
+.hero__scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(13,15,17,.72) 0%, rgba(13,15,17,.18) 38%, rgba(13,15,17,.9) 100%);
+}
+.hero__wrap {
+  z-index: 1;
+  max-height: none;                /* 아래 정렬이라 .wrap 의 85dvh 상한은 필요 없다 */
+  padding-bottom: clamp(48px, min(7vw, 9dvh), 100px);
+}
+.hero .eyebrow { margin-bottom: clamp(14px, 2.4dvh, 28px); }
+.hero__title {
+  margin: 0;
+  font-size: clamp(36px, min(7.6vw, 10.5dvh), 100px);
+  line-height: 1.1; font-weight: 800; color: #fff; text-wrap: balance;
+}
+.hero__title span { color: var(--mint); }
+.hero__foot {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: clamp(16px, 2.4dvh, 32px); margin: clamp(22px, 3.6dvh, 44px) 0 0;
+}
+.hero__lead {
+  margin: 0; max-width: 560px;
+  font-size: clamp(15px, min(1.6vw, 2.2dvh), 19px); line-height: 1.5; font-weight: 500;
+  color: rgba(255,255,255,.8); text-wrap: pretty;
+}
+.hero__scroll { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,.72); font-size: 13px; font-weight: 700; }
+.hero__scroll:hover { color: #fff; }
+.hero__scroll-line { display: block; width: 44px; height: 1px; background: rgba(255,255,255,.5); }
+
+
+/* ============ PROCESS (핀 구간) ============ */
+
+/* 레이어를 처음부터 따로 만들어 둔다 — 핀이 걸리는 순간(position:fixed 전환) 레이어를 새로 만들고
+   처음 그리느라 첫 방문에만 한 번 튀었다. translateZ(0) 는 위치에 영향이 없다 */
+.proc { background: var(--dark); color: #fff; transform: translateZ(0); backface-visibility: hidden; }
+.proc__title {
+  margin: clamp(14px, 2.2dvh, 30px) 0 0;
+  font-size: clamp(26px, min(4.2vw, 6dvh), 54px);
+  line-height: 1.18; font-weight: 800; text-wrap: pretty;
+}
+.proc__rail {
+  position: relative; margin: clamp(22px, 4dvh, 54px) 0 0;
+  height: 2px; background: rgba(255,255,255,.16);
+}
+/* 진행 막대 — 폭 100% 를 scaleX 로 줄여 두고(app.js renderProcess 가 .16/.5/.83 을 넣는다) 스프링으로 늘린다.
+   linear() 는 감쇠비 .78 스프링을 41점으로 샘플한 곡선 — 목표를 2% 정도 지나쳤다가 출렁이며 자리잡는다.
+   linear() 를 모르는 브라우저는 앞 줄의 back-out 베지어(살짝 넘쳤다 돌아옴)를 쓴다. */
+.proc__bar {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 100%;
+  background: var(--mint); border-radius: 2px;
+  transform: scaleX(.16); transform-origin: left center; will-change: transform;
+  transition: transform 1.1s cubic-bezier(.34,1.08,.64,1);
+  transition: transform 1.1s linear(0, 0.02, 0.072, 0.145, 0.23, 0.321, 0.412, 0.5, 0.582, 0.657, 0.724, 0.783, 0.833, 0.876, 0.911, 0.94, 0.963, 0.981, 0.994, 1.004, 1.011, 1.016, 1.019, 1.02, 1.02, 1.019, 1.018, 1.016, 1.015, 1.013, 1.011, 1.009, 1.008, 1.006, 1.005, 1.004, 1.003, 1.002, 1.002, 1.001, 1);
+}
+.proc__cards {
+  margin: 0; display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: clamp(18px, 2.4vw, 34px);
+}
+.step {
+  min-width: 0; padding: clamp(14px, 2.4dvh, 32px) 0 0;
+  /* 아직 차례가 아닌 단계 — 원본 .2 는 글이 거의 안 읽혀 .35 로 올렸다. 강조 대비는 그대로 남는다 */
+  opacity: .35; transition: opacity .7s cubic-bezier(.22,1,.36,1);
+}
+/* 켜질 때는 막대가 그 칸에 거의 닿은 뒤(.15s 지연) 차오른다. 꺼질 때는 지연 없이 */
+.step.is-on { opacity: 1; transition-delay: .15s; }
+.step__head { margin: 0; display: flex; align-items: center; gap: 12px; }
+.step__no {
+  font-size: clamp(24px, min(3vw, 4.2dvh), 38px); font-weight: 800; line-height: 1;
+  color: rgba(255,255,255,.5); font-variant-numeric: tabular-nums;
+  transition: color .7s cubic-bezier(.22,1,.36,1);
+}
+.step.is-on .step__no { color: var(--mint); transition-delay: .15s; }
+.step__name { font-size: clamp(17px, min(1.9vw, 2.6dvh), 23px); font-weight: 700; }
+.step__lead {
+  margin: clamp(12px, 2dvh, 24px) 0 0;
+  font-size: clamp(15px, min(1.7vw, 2.4dvh), 20px); font-weight: 700; line-height: 1.5;
+  color: #fff; text-wrap: pretty;
+}
+/* 부가 설명 — 문구의 줄 단위(span 블록)마다 새 줄에서 시작하고, 칸이 좁으면 그 안에서 다시 흐른다.
+   한글은 어절 단위로만 끊는다. 글자를 조금 키우고 대비를 올렸다 (.7 → .82) */
+.step__body {
+  margin: 12px 0 0; font-size: clamp(14.5px, min(1.15vw, 1.9dvh), 16px); line-height: 1.8;
+  color: rgba(255,255,255,.82); word-break: keep-all; overflow-wrap: break-word;
+}
+.step__body span { display: block; text-wrap: pretty; }
+.step__lead { word-break: keep-all; }
+
+
+/* ============ WHAT WE DO ============ */
+
+/* height 를 주지 않는다 — .wrap 의 max-height:85dvh 안에서 내용 높이만큼만 차지하고,
+   섹션의 align-items:center 가 세로 가운데로 놓는다. */
+.biz__wrap { display: flex; flex-direction: column; gap: clamp(16px, 2.4dvh, 32px); }
+.biz__head {
+  flex: 0 0 auto;
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: clamp(14px, 2vw, 28px);
+}
+.biz__headings { min-width: 0; }
+.biz__title {
+  margin: clamp(14px, 2.2dvh, 30px) 0 0;
+  font-size: clamp(26px, min(4.4vw, 6dvh), 58px);
+  line-height: 1.18; font-weight: 800; text-wrap: pretty;
+}
+.biz__ctrl { display: flex; gap: 10px; flex-shrink: 0; }
+.biz__count { display: none; }   /* 좁은 화면 슬라이드에서만 */
+/* 좁은 화면에서만 쓰는 보강 요소 — 넓은 화면은 디자인 원본 그대로 */
+.partners__note { display: none; }
+.biz__arrow {
+  width: clamp(42px, 6dvh, 52px); height: clamp(42px, 6dvh, 52px);
+  border-radius: 999px; border: 1px solid #dcdcd8;
+  background: #fff; color: var(--ink); font-family: inherit; font-size: 19px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.biz__arrow:hover:not(:disabled) { background: var(--ink); color: #fff; border-color: var(--ink); }
+/* 끝에 닿아 넘길 카드가 없을 때 (app.js applyGeometry) */
+.biz__arrow:disabled { color: #c4c6ca; border-color: #ececea; background: #f6f6f4; cursor: default; }
+
+/* 캐러셀 높이 440px 고정(디자인 원본값). grow 0 이라 남는 높이를 먹지 않고,
+   shrink 1 이라 낮은 화면에서는 85dvh 안에 들어오도록 알아서 줄어든다. */
+.biz__stage { flex: 0 1 440px; min-height: 0; display: flex; }
+.biz__clip { width: 100%; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.biz__strip {
+  display: flex; align-items: stretch; width: 100%; height: 100%;
+  user-select: none; touch-action: pan-y; cursor: grab;
+}
+.biz__strip:active { cursor: grabbing; }
+
+.panel {
+  position: relative; flex: 0 0 0%; min-width: 0;
+  border: 0; padding: 0; margin: 0; font-family: inherit;
+  cursor: pointer; overflow: hidden; background: var(--line); height: 100%;
+  border-radius: 4px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+  /* 펼침 — 원본(.16,1,.3,1 / .7s)과 같은 감속형이되 출발을 누그러뜨린 값.
+     원본은 처음 0.1초에 거의 다 움직여 툭 튀는 느낌이 있었다. ease-in-out 계열은 과했다.
+     (.22,1,.36,1 / .75s) 에서 10% 더 누그러뜨려 (.24,1,.4,1 / .8s) */
+  --panel-ease: cubic-bezier(.24,1,.4,1);
+  --panel-dur: .8s;
+  /* opacity 의 지연 --intro-d 와 길이 --intro-dur 는 첫 등장(motion.css .biz__strip[data-intro]) 동안만
+     app.js 가 매긴다 — 카드가 왼쪽부터 하나씩 차오른다. 등장이 끝나면 지워져 평소 펼침에는
+     지연이 없고 길이도 --panel-dur 로 돌아간다 */
+  transition: flex-grow var(--panel-dur) var(--panel-ease), flex-basis var(--panel-dur) var(--panel-ease),
+              margin-left var(--panel-dur) var(--panel-ease),
+              opacity var(--intro-dur, var(--panel-dur)) var(--panel-ease) var(--intro-d, 0ms);
+}
+.panel__bg {
+  position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%);
+  height: 100%; width: 100%; display: block;
+  background-size: cover; background-position: center;
+  transition: width var(--panel-dur) var(--panel-ease);
+}
+/* 사진이 제 피사체보다 멀게 잡힌 카드만 따로 키운다. background-size 를 건드리면
+   cover 가 풀려 비는 곳이 생기므로, cover 위에 transform 으로 얹는다.
+   가운데 기준으로 커지고 넘치는 만큼은 .panel 의 overflow:hidden 이 자른다. */
+.panel__bg--zoom { transform: translateX(-50%) scale(1.2); }
+/* 사진마다 피사체가 앉은 높이가 달라 보이는 창을 세로로 옮긴다. 값은 카드마다
+   --shift 로 준다(양수 = 아래로 = 사진 위쪽이 더 보임). cover 로 채우고 남은 여유
+   안에서만 움직이므로 빈 곳이 생기지 않는다 — transform 으로 밀면 띠가 생긴다.
+   app.js 가 배경 폭을 펼쳤을 때 기준으로 고정하므로(app.js:259) 접혀도 여유는 같다. */
+.panel__bg--shift { background-position: center calc(50% + var(--shift, 0px)); }
+.panel__active {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
+  gap: 10px; padding: clamp(18px, 2.6vw, 32px); text-align: left; opacity: 0;
+  background: linear-gradient(to top, rgba(13,15,17,.82) 0%, rgba(13,15,17,.34) 45%, rgba(13,15,17,0) 78%);
+  transition: opacity .7s cubic-bezier(.16,1,.3,1);
+}
+/* backdrop-filter 를 쓰지 않는다 — 부모 .panel__active 가 투명도로 페이드되는 동안에는
+   블러가 사진까지 닿지 못해(조상 opacity<1 이면 backdrop 이 그 안으로 갇힘) 칩 색이
+   잠깐 바뀌었다가 페이드가 끝나는 순간 툭 돌아온다. 반투명 단색이면 내내 같다. */
+.panel__tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 11px; border-radius: 999px;
+  background: rgba(255,255,255,.2);
+}
+.panel__tag span { font-size: 12px; font-weight: 700; color: #fff; }
+.panel__title {
+  font-size: clamp(18px, min(2.1vw, 3dvh), 28px); font-weight: 800; line-height: 1.24;
+  color: #fff; text-wrap: pretty;
+}
+.panel__short {
+  white-space: nowrap; word-break: keep-all; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis;
+  font-size: clamp(11.5px, 1.15vw, 15px); line-height: 1.7; color: rgba(255,255,255,.84);
+}
+.panel__neighbor {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
+  padding: clamp(14px, 1.8vw, 22px); text-align: left; opacity: 0;
+  background: linear-gradient(to top, rgba(13,15,17,.7), rgba(13,15,17,0) 70%);
+  transition: opacity .7s cubic-bezier(.16,1,.3,1);
+}
+.panel__ntag { font-size: 11.5px; font-weight: 700; color: var(--mint); }
+.panel__ntitle { font-size: clamp(14px, 1.3vw, 17px); font-weight: 700; line-height: 1.35; color: #fff; text-wrap: pretty; }
+.panel__folded {
+  position: absolute; inset: 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 16px; background: rgba(13,15,17,.55); opacity: 0;
+  transition: opacity .7s cubic-bezier(.16,1,.3,1);
+}
+.panel__folded span {
+  writing-mode: vertical-rl; white-space: nowrap; word-break: keep-all; overflow-wrap: normal;
+  line-height: 1; font-size: 13px; font-weight: 700; color: #fff;
+}
+
+
+/* ============ NOW RUNNING ============ */
+
+.nums__title {
+  margin: clamp(14px, 2.2dvh, 30px) 0 0;
+  font-size: clamp(26px, min(4.4vw, 6dvh), 58px);
+  line-height: 1.2; font-weight: 800; text-wrap: pretty;
+}
+/* 칸 폭을 똑같이 나누면 내용 길이 차이(4,860명 참여 중 / 13년)만큼 빈 공간이 들쭉날쭉해 보인다.
+   그래서 항목은 내용 폭만 차지하고, 남는 폭을 항목 사이에 똑같이 나눈다(space-between). */
+.nums__band {
+  margin: clamp(22px, 4dvh, 56px) 0 0; border-top: 1px solid #e6e6e3;
+  display: flex; justify-content: space-between; column-gap: clamp(24px, 3vw, 48px);
+}
+.stat { flex: 0 1 auto; min-width: 0; padding: clamp(18px, 3dvh, 40px) 0; }
+/* 한 줄에 네 개가 안 들어가는 폭에서는 2×2 로 접는다 — 줄바꿈된 space-between 은 마지막 줄이 어긋난다 */
+@media (max-width: 900px) {
+  .nums__band { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* 2열이 숫자(4,860)를 못 담는 아주 좁은 폭에서만 한 줄 하나 */
+@media (max-width: 340px) {
+  .nums__band { grid-template-columns: minmax(0, 1fr); }
+}
+.stat__k { margin: 0; font-size: 13px; font-weight: 700; color: var(--gray); }
+.stat__row { margin: clamp(8px, 1.6dvh, 16px) 0 0; display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
+.stat__n {
+  font-size: clamp(34px, min(5vw, 7.2dvh), 66px); font-weight: 800; line-height: .95;
+  font-variant-numeric: tabular-nums;
+}
+.stat__unit { font-size: clamp(16px, min(1.8vw, 2.6dvh), 23px); font-weight: 700; color: var(--teal); }
+
+/* ---- 오도미터 릴 (count-up.tsx 의 slide 효과) ----
+   한 자리 = 0~9+0 이 세로로 쌓인 띠. 창은 한 칸(1em)만 보이고 app.js 가 em 단위로 민다.
+   칸 높이와 미는 양이 같은 단위라 폰트 크기가 바뀌어도 어긋나지 않는다. */
+.odo {
+  position: relative; display: inline-block;
+  width: 1ch;                    /* tabular-nums 라 숫자 한 글자 폭과 정확히 같다 */
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  overflow-y: clip;              /* clip 이라야 overflow-x: visible 과 같이 쓸 수 있다 */
+  overflow-x: visible;
+}
+.odo__sizer { visibility: hidden; display: block; }
+.odo__reel {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; flex-direction: column;
+  will-change: transform;
+}
+.odo__reel > span {
+  display: flex; align-items: center; justify-content: center;
+  height: 1em;
+}
+
+.odo-sep { display: inline-block; }           /* 천 단위 쉼표 — 구르지 않는다 */
+.stat__note { margin: clamp(8px, 1.6dvh, 14px) 0 0; font-size: 14px; line-height: 1.6; color: var(--muted); text-wrap: pretty; }
+
+
+/* ============ ON SITE (핀 구간) ============ */
+
+.onsite { background: #f7f8f9; color: #0f172a; }
+.onsite__titlewrap {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 var(--gutter); pointer-events: none;
+}
+/* 사진이 이 글씨의 앞뒤(z-index 30 / 5)를 스치며 지나간다.
+   퇴장(투명도·들어올림)은 app.js 가 핀 진행도에 맞춰 직접 넣는다 */
+.onsite__title {
+  margin: 0; text-align: center;
+  font-size: clamp(30px, min(6.6vw, 9dvh), 96px); font-weight: 800; line-height: 1.06;
+  color: #0f172a; text-wrap: balance;
+  will-change: opacity, transform;
+}
+.onsite__track { position: absolute; inset: 0; }
+
+/* 위치·크기·회전·투명도 전부 app.js 가 v2Layout 표대로 계산해 넣는다 */
+.pol {
+  opacity: 0;
+  position: absolute; top: 50%; margin: 0; box-sizing: border-box;
+  padding: 10px 10px 4px; background: #fff;
+  border: 1px solid #e2e8f0; border-radius: 3px;
+  box-shadow: 0 18px 38px rgba(15,23,42,.10), 0 2px 6px rgba(15,23,42,.05);
+  transform: translate(-50%, 0);
+  will-change: transform, opacity;
+}
+.pol__photo {
+  display: block; width: 100%; aspect-ratio: 4/5;
+  background-size: cover; background-position: center; background-color: #e2e8f0;
+}
+/* 1번과 7번만 가로 사진 — 나머지는 세로 4/5 */
+.pol:first-child .pol__photo,
+.pol:last-child .pol__photo { aspect-ratio: 4/3; }
+/* 4번은 피사체가 오른쪽으로 치우쳐 있어 보이는 창을 왼쪽으로 30px 옮긴다 */
+.pol:nth-child(4) .pol__photo { background-position: calc(50% - 30px) center; }
+.pol figcaption {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  padding: 9px 2px 1px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9.5px; color: #94a3b8;
+}
+.pol figcaption span + span { color: #64748b; }
+
+/* GSAP 미로딩 시 — 폴라로이드는 좌표가 없어 겹치므로 접고 타이틀만 남긴다 */
+.no-gsap .onsite__track { display: none; }
+
+
+/* ============ PARTNERS — 3줄 마키 ============ */
+
+/* 디자인 원본처럼 제목만 1400px 래퍼에 담고 마키는 섹션의 직계 자식으로 둔다.
+   그래서 섹션 자체를 세로 스택으로 바꾼다 — 기본 규격의 align-items:center 를
+   stretch 로 풀지 않으면 마키가 내용 폭으로 줄어 화면 끝까지 닿지 않는다. */
+.partners {
+  flex-direction: column; justify-content: center; align-items: stretch;
+  gap: clamp(20px, 4dvh, 56px);
+}
+.partners__head { flex: 0 0 auto; }
+.partners__title {
+  margin: clamp(12px, 2dvh, 26px) 0 0;
+  font-size: clamp(22px, min(3.4vw, 4.6dvh), 44px);
+  line-height: 1.25; font-weight: 800; text-wrap: pretty;
+}
+.marquee {
+  display: grid; gap: clamp(10px, 1.4dvh, 18px); width: 100%;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+.marquee__row { overflow: hidden; width: 100%; }
+.marquee__track { display: flex; gap: clamp(10px, 1.2vw, 18px); width: max-content; will-change: transform; }
+.marquee__cell {
+  box-sizing: border-box; flex: 0 0 auto;
+  width: clamp(136px, 15vw, 186px); height: clamp(80px, 12.5dvh, 130px);
+  display: flex; align-items: center; justify-content: center; padding: 13px 19px;
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+}
+.marquee__cell img {
+  max-width: 100%; max-height: 100%; object-fit: contain; display: block;
+  filter: grayscale(1); opacity: .6; transition: filter .3s, opacity .3s;
+}
+.marquee__cell img:hover { filter: grayscale(0); opacity: 1; }
+
+
+/* ============ CONTACT + 푸터 = 마지막 한 화면 ============
+   둘을 각각 100dvh 로 두면 내용 대비 여백이 과해진다. 하나의 화면으로 묶어
+   문의가 남는 높이를 채우고(가운데 정렬), 푸터는 바닥에 제 높이만큼만 눕는다. */
+
+.screen-end {
+  position: relative; box-sizing: border-box;
+  height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.screen-end > .contact {
+  height: auto; flex: 1 1 auto; min-height: 0;
+  padding: clamp(20px, 4dvh, 56px) 0;
+}
+.screen-end > .ftr { height: auto; flex: 0 0 auto; }
+
+.contact { background: #f4f5f5; }
+/* 18px 격자의 청록 점. 100deg 마스크로 왼쪽 30% 는 비우고 오른쪽 90% 에서 다 드러난다 */
+.contact__grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(0,144,140,.28) 1.4px, transparent 1.6px);
+  background-size: 18px 18px;
+  -webkit-mask-image: linear-gradient(100deg, transparent 30%, #000 90%);
+          mask-image: linear-gradient(100deg, transparent 30%, #000 90%);
+}
+/* 오른쪽 끝으로 살짝 빠져나가는 점묘 마크. 디자인의 고정 크기 그대로 두고
+   넘치는 만큼은 섹션의 overflow:hidden 이 자른다 */
+.contact__dots {
+  position: absolute; right: -2%; top: 50%; transform: translateY(-50%);
+  width: 1186px; height: 474px; max-width: none; display: block;
+  filter: brightness(0); opacity: .08;
+  pointer-events: none; user-select: none;
+}
+.contact__wrap {
+  display: flex; flex-direction: column;
+  gap: clamp(18px, min(3vh, 3vw), 36px);
+}
+.contact__title {
+  margin: 0; font-size: clamp(28px, min(5.4vw, 7dvh), 64px); line-height: 1.1; font-weight: 800;
+  color: var(--ink); text-wrap: balance;
+}
+.contact__lead {
+  margin: 0; max-width: 520px;
+  font-size: clamp(15px, min(1.35vw, 2dvh), 18px); line-height: 1.8; color: var(--muted);
+  text-wrap: pretty;
+}
+
+
+/* ============ 푸터 ============ */
+
+.ftr { background: #fff; border-top: 1px solid var(--line); color: var(--ink); }
+
+/* 마지막 화면의 바닥 띠 — 제 높이만 차지하도록 세로 여백을 직접 잡는다.
+   디자인 원본은 44~68px / 36~56px 이지만 여기서는 문의와 한 화면을 나눠 쓰므로
+   dvh 를 상한에 섞어 화면이 낮아지면 같이 줄어들게 한다. */
+.ftr__wrap {
+  padding-top: clamp(28px, min(5vw, 6dvh), 68px);
+  padding-bottom: clamp(24px, min(4vw, 5dvh), 56px);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(28px, 4vw, 64px);
+}
+.ftr__col {
+  min-width: 0; display: flex; flex-direction: column;
+  gap: clamp(18px, min(2.4vw, 2.4dvh), 30px);
+}
+.ftr__meta { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.ftr__meta p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--gray); }
+.ftr__copy { margin: 0; font-size: 12.5px; color: #a8abb1; }
+.ftr__brand {
+  min-width: 0; display: flex; flex-direction: column;
+  align-items: flex-start; justify-self: end;
+}
+.ftr__brand img { height: 26px; width: auto; display: block; }
+
+
+/* =========================================================
+   좁은 화면(휴대폰, 760px 미만) — app.js 의 NARROW_MQ 와 같은 경계다.
+   759.98px 로 적는 이유: 폭이 정확히 760px 일 때 CSS 와 JS 가 서로 다른 편에 서지 않게.
+
+   - 섹션 한 화면 규격을 푼다. 휴대폰 세로 화면에 억지로 100dvh 를 지키면 글자가 잘린다.
+     히어로만 한 화면으로 남긴다(svh — 주소창이 접혔다 펴질 때 높이가 튀지 않는다).
+   - PROCESS·ON SITE 핀은 app.js 가 이 폭에서 만들지 않는다. 그 대신 일반 스크롤 위에서
+     단계가 하나씩 켜지고, 폴라로이드는 2열로 흩어져 차례로 떠오른다.
+   - 관성 스크롤(Lenis)과 스냅도 이 폭에서는 꺼진다 — 터치 기본 스크롤이 가장 자연스럽다.
+   ========================================================= */
+
+@media (max-width: 759.98px) {
+  section, footer { height: auto; }
+  .wrap { max-height: none; }
+  /* 줄이 짧아 한글이 낱자로 끊기기 쉽다("함께합/니다") — 어절 단위로만 넘긴다 */
+  body { word-break: keep-all; overflow-wrap: break-word; }
+
+  /* ---- 헤더 → 전체 화면 메뉴 ---- */
+  .hdr { --hdr-h: 84px; }   /* 2026-10-29: 76 → 84px, 로고 28 → 32px, 메뉴 단추 52 → 58px */
+  .hdr__brand img { height: 32px; }
+  .hdr__brand, .hdr__menu { position: relative; z-index: 2; }
+  /* 메뉴 버튼 — WHAT WE DO 화살표(.biz__arrow)와 같은 둥근 테두리 단추 안에 두 줄.
+     줄은 가운데 기준 절대 배치라 X 로 접힐 때 두 줄이 정확히 한 점에서 교차한다.
+     누르는 영역은 52px, 보이는 원은 48px */
+  .hdr__menu {
+    display: block; width: 58px; height: 58px; margin-right: -3px; padding: 0;
+    border: 0; background: none; cursor: pointer;
+    color: #fff; transition: color .35s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hdr__menu::before {
+    content: ""; position: absolute; inset: 2px; border-radius: 999px;
+    border: 1px solid currentColor; opacity: .32;
+    transition: opacity .35s ease, border-color .35s ease, transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .hdr__menu:active::before { transform: scale(.92); }
+  .hdr__menu span {
+    position: absolute; left: 50%; top: 50%;
+    width: 22px; height: 2px; margin-left: -11px; border-radius: 2px; background: currentColor;
+    transition: transform .5s cubic-bezier(.65,0,.35,1), width .4s cubic-bezier(.22,1,.36,1), margin .4s cubic-bezier(.22,1,.36,1);
+  }
+  /* 위 줄은 길게, 아래 줄은 짧게 오른쪽 끝을 맞춘다 — 메뉴판 글씨가 왼쪽 정렬이라 오른쪽에 닻을 둔다 */
+  .hdr__menu span:first-child { transform: translateY(-5px); }
+  .hdr__menu span + span     { width: 14px; margin-left: -3px; transform: translateY(5px); }
+  .hdr.is-solid .hdr__menu { color: var(--ink); }
+  .hdr.is-solid .hdr__menu::before { opacity: .18; }
+
+  /* nav 자체가 메뉴판이 된다. 열리기 전에는 visibility 로 숨겨 탭 이동에도 잡히지 않는다 */
+  .hdr__nav {
+    position: fixed; inset: 0; z-index: 1;
+    flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px;
+    padding: 0 var(--gutter); background: var(--dark); color: #fff;
+    opacity: 0; visibility: hidden;
+    transition: opacity .4s ease, visibility 0s linear .4s;
+    counter-reset: hnav;
+  }
+  .hdr__nav a {
+    display: flex; align-items: baseline; gap: 14px; padding: 8px 0;
+    font-size: clamp(30px, 9vw, 40px); font-weight: 800;
+    transform: translateY(18px); opacity: 0;
+    transition: transform .6s cubic-bezier(.22,1,.36,1), opacity .5s ease;
+    counter-increment: hnav;
+  }
+  .hdr__nav a::before {
+    content: "0" counter(hnav);
+    font-size: 13px; font-weight: 700; color: var(--mint); font-variant-numeric: tabular-nums;
+  }
+  .hdr.is-solid .hdr__nav { color: #fff; }
+
+  /* 열림 — 반투명 판·블러를 걷는다. backdrop-filter 가 남아 있으면 fixed 인 nav 가
+     화면이 아니라 헤더 띠(60px) 안에 갇힌다 */
+  .hdr.is-open { background: transparent; backdrop-filter: none; border-bottom-color: transparent; transform: none;
+                 transition: none; }   /* 블러·숨김이 서서히 풀리는 동안에도 nav 가 헤더 띠에 갇히므로 즉시 바꾼다 */
+  .hdr.is-open .hdr__brand img { filter: brightness(0) invert(1); }
+  .hdr.is-open .hdr__menu { color: #fff; }
+  .hdr.is-open .hdr__menu::before { opacity: 1; border-color: var(--mint); }
+  .hdr.is-open .hdr__menu span { width: 22px; margin-left: -11px; }
+  .hdr.is-open .hdr__menu span:first-child { transform: rotate(45deg); }
+  .hdr.is-open .hdr__menu span + span     { transform: rotate(-45deg); }
+  .hdr.is-open .hdr__nav { opacity: 1; visibility: visible; transition: opacity .4s ease; }
+  .hdr.is-open .hdr__nav a { transform: none; opacity: 1; }
+  .hdr.is-open .hdr__nav a:nth-child(1) { transition-delay: .08s; }
+  .hdr.is-open .hdr__nav a:nth-child(2) { transition-delay: .14s; }
+  .hdr.is-open .hdr__nav a:nth-child(3) { transition-delay: .2s; }
+  .hdr.is-open .hdr__nav a:nth-child(4) { transition-delay: .26s; }
+  /* 메뉴가 열린 동안 뒤 페이지는 스크롤되지 않는다 */
+  html.menu-open, html.menu-open body { overflow: hidden; }
+
+  /* ---- 섹션 규격 — 섹션마다 적어도 한 화면(100svh)을 차지하고 내용은 세로 가운데.
+     내용이 한 화면보다 길면 그만큼 늘어난다(높이 고정이 아니라 min-height) ---- */
+  .proc, .biz, .nums, .onsite, .partners {
+    min-height: 100svh;
+    padding: clamp(112px, 16svh, 150px) 0 clamp(96px, 13svh, 128px);
+  }
+  .eyebrow { font-size: 14px; }
+  /* 섹션 제목 — 모두 같은 급 */
+  .proc__title, .biz__title, .nums__title, .partners__title {
+    margin-top: 18px; font-size: clamp(32px, 9.4vw, 40px); line-height: 1.25;
+    text-wrap: balance;   /* 끝 단어 하나만 다음 줄로 떨어지지 않게("…하는 / 일들") */
+  }
+
+  /* ---- 히어로 ---- */
+  .hero { height: 100svh; min-height: 520px; }
+  .hero__lead { max-width: none; font-size: 17px; }
+  /* 36px → 42px. "배우는 가치를 넘어" 한 줄이 350px 폭에 그대로 들어가는 크기 */
+  .hero__title { font-size: clamp(38px, 10.8vw, 46px); }
+  /* SCROLL 표시는 휴대폰에서 뺀다 — 손가락으로 미는 화면이라 안내가 필요 없다 */
+  .hero__scroll { display: none; }
+
+  /* ---- PROCESS — 세로로 쌓고, 가로 진행 막대 대신 단계마다 윗줄이 켜진다 ---- */
+  .proc__rail { display: none; }
+  .proc__cards { margin-top: clamp(40px, 7svh, 60px); gap: 0; }
+  .step__no { font-size: 36px; }
+  .step__name { font-size: 22px; }
+  .step__lead { font-size: 18px; }
+  .step__body { font-size: 16px; }
+  /* 단계 사이·단계 안(번호 → 한 줄 요약 → 설명) 간격을 넉넉히 — 좁게 붙어 있으면 덩어리로 보여 안 읽힌다 */
+  .step { position: relative; padding: 30px 0 64px; border-top: 1px solid rgba(255,255,255,.16); }
+  .step:last-child { padding-bottom: 8px; }
+  /* 민트 선 — 회색 윗줄 위에 겹쳐 두고, 단계가 켜지면 왼쪽에서 오른쪽으로 차오른다.
+     넓은 화면 진행 막대(.proc__bar)처럼 폭이 아니라 scaleX 로 늘려 레이아웃 재계산이 없다 */
+  .step::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px;
+    background: var(--mint);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform 1.1s cubic-bezier(.65,0,.35,1);
+  }
+  .step.is-on::before { transform: scaleX(1); }
+  /* 글자는 선이 반쯤 지나갈 때 따라 밝아진다 */
+  .step.is-on { transition-delay: .35s; }
+  .step.is-on .step__no { transition-delay: .35s; }
+  .step__lead { margin-top: 18px; }
+  .step__body { margin-top: 14px; }
+  .step__body span { display: inline; }
+
+  /* ---- WHAT WE DO — 아코디언 대신 한 장씩 넘기는 슬라이드 ----
+     카드 한 장이 폭의 88% 를 차지하고 다음 카드가 오른쪽에 살짝 걸쳐 "밀 수 있다"를 알린다.
+     넘김은 이 상자 안의 가로 스크롤 + scroll-snap 이다(페이지 스크롤 스냅이 아니다 — 핀과 무관).
+     화살표·카운터·카드 탭은 app.js scrollToCard 가 같은 스크롤을 움직인다 */
+  .biz__head { align-items: flex-end; }
+  .biz__ctrl { margin-left: auto; align-items: center; }
+  .biz__count {
+    display: block; margin-right: 6px;
+    font-size: 14px; font-weight: 700; color: var(--gray); font-variant-numeric: tabular-nums;
+  }
+  .biz__wrap { gap: 28px; }
+  .biz__arrow { width: 48px; height: 48px; font-size: 19px; }
+  .biz__stage { flex: 0 0 auto; height: clamp(480px, 138vw, 620px); }
+  /* 카드가 오른쪽 여백까지 흘러 화면 끝에서 잘리도록 래퍼의 오른쪽 거터만큼 상자를 넓힌다 */
+  .biz__clip { overflow: visible; margin-right: calc(-1 * var(--gutter)); }
+  .biz__strip {
+    gap: 10px; overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; scroll-padding-left: 0;
+    padding-right: var(--gutter); box-sizing: border-box;
+    touch-action: pan-x pan-y; cursor: auto; user-select: none;
+    scrollbar-width: none;
+  }
+  .biz__strip::-webkit-scrollbar { display: none; }
+  .panel {
+    flex: 0 0 90%; scroll-snap-align: start; scroll-snap-stop: always;
+    transition: opacity var(--intro-dur, .5s) var(--panel-ease) var(--intro-d, 0ms);
+  }
+  .panel__bg { width: 100%; transition: none; }
+  /* 세로로 긴 카드라 cover 의 위아래 여유가 없다 — 넓은 화면용 --shift 를 그대로 두면 사진이 반복돼 이음매가 보인다 */
+  .panel__bg--shift { background-position: center; }
+  .panel__active { padding: 26px 22px; gap: 12px; transition: none; }
+  .panel__tag span { font-size: 13px; }
+  .panel__neighbor, .panel__folded { display: none; }
+  .panel__title { font-size: 26px; }
+  .panel__short { white-space: normal; text-overflow: clip; font-size: 16px; line-height: 1.6; }
+
+  /* ---- NOW RUNNING — 2×2 유지. 한 줄 4단은 화면 세 개 길이가 된다 ---- */
+  .nums__band { margin-top: clamp(36px, 6svh, 56px); column-gap: 24px; row-gap: 40px; }   /* 2026-10-29: 20 → 40px */
+  .stat { padding: 32px 0 20px; }
+  .stat__k { font-size: 15px; }
+  .stat__n { font-size: clamp(40px, 12vw, 50px); }
+  .stat__unit { font-size: 18px; }
+  .stat__note { font-size: 15px; }
+  .stat__row { margin-top: 16px; }   /* 12 → 16px */
+  .stat__note { margin-top: 16px; }   /* 12 → 16px */
+
+  /* ---- ON SITE — 핀 없이 한 열로 크게, 좌우로 번갈아 비켜 놓은 폴라로이드 ----
+     app.js 는 이 폭에서 좌표를 넣지 않는다(인라인 스타일을 지운다) */
+  .onsite { display: flex; flex-direction: column; justify-content: center; align-items: stretch; }
+  .onsite__titlewrap { position: static; padding: 0 var(--gutter); }
+  .onsite__title { font-size: clamp(36px, 10.4vw, 46px); line-height: 1.18; will-change: auto; }
+  .onsite__track {
+    position: static;
+    display: flex; flex-direction: column; gap: 28px;
+    padding: clamp(48px, 8svh, 72px) var(--gutter) 0;
+  }
+  .no-gsap .onsite__track { display: flex; }
+  .pol {
+    position: relative; top: auto; opacity: 1; transform: none; will-change: auto;
+    width: 84%; padding: 10px 10px 4px;
+  }
+  /* 홀수는 왼쪽, 짝수는 오른쪽에 붙여 흩어 놓은 느낌. 가로 사진(1·7번)은 조금 더 넓게 */
+  .pol:nth-child(odd) { align-self: flex-start; }
+  .pol:nth-child(even) { align-self: flex-end; }
+  .pol:first-child, .pol:last-child { width: 94%; }
+  .pol figcaption { font-size: 11px; padding-top: 9px; }
+  /* 회전은 넓은 화면 배치표(app.js V2_LAYOUT)와 같은 값. transform 은 등장 모션이 쓰므로 rotate 로 */
+  .pol:nth-child(1) { rotate: -1deg; }
+  .pol:nth-child(2) { rotate: 2deg; }
+  .pol:nth-child(3) { rotate: 1.5deg; }
+  .pol:nth-child(4) { rotate: -2deg; }
+  .pol:nth-child(5) { rotate: 1deg; }
+  .pol:nth-child(6) { rotate: -1.5deg; }
+  .pol:nth-child(7) { rotate: .8deg; }
+  html.motion .pol {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity .9s cubic-bezier(.215,.61,.355,1), transform .9s cubic-bezier(.215,.61,.355,1);
+  }
+  html.motion .pol.is-in { opacity: 1; transform: none; }
+
+  /* ---- PARTNERS — 제목을 다른 섹션 제목과 같은 급으로, 로고는 카드를 꽉 채우게 ---- */
+  .partners { gap: 40px; }
+  .partners__note {
+    display: block; margin: 16px 0 0;
+    font-size: 17px; line-height: 1.6; color: var(--muted);
+  }
+  .partners__note b { color: var(--teal); font-weight: 800; }
+  .marquee { gap: 14px; }
+  .marquee__track { gap: 14px; }
+  /* 로고가 차지하는 칸을 이전(132×72)의 두 배 가까이(252×140)로. 3줄은 넓은 화면과 같다 */
+  .marquee__cell { width: 280px; height: 160px; padding: 10px 14px; border-radius: 16px; }
+  /* 칸이 커져 한 줄(9곳 × 294px)이 길어진 만큼 같은 속도로 보이도록 한 바퀴 시간을 늘린다 */
+  .marquee .marquee__row:nth-child(1) .marquee__track { animation-duration: 100s; }
+  .marquee .marquee__row:nth-child(2) .marquee__track { animation-duration: 126s; }
+  .marquee .marquee__row:nth-child(3) .marquee__track { animation-duration: 112s; }
+  /* 마우스가 없어 hover 로 색을 되살릴 수 없다 — 처음부터 조금 더 진하게 */
+  .marquee__cell img { opacity: .78; }
+
+  /* ---- 문의 + 푸터 = 합쳐서 한 화면 ----
+     묶음(.screen-end)이 한 화면을 채우고, 푸터는 제 높이만, 남는 높이는 문의가 먹는다(flex 1).
+     문의 자체에는 최소 높이를 주지 않는다 — 혼자 한 화면이면 푸터가 다음 화면으로 밀린다 */
+  .screen-end { height: auto; min-height: 100svh; }
+  /* 점묘 ORM 마크 — 넓은 화면은 1186px 고정 크기로 오른쪽 밖으로 빠져 잘리지만, 휴대폰에서는
+     마크가 거의 다 보이도록 화면 폭보다 조금만 넓게(좌우가 각 14px 정도 잘린다) 줄여 문의 영역
+     아래쪽에 둔다(원본 비율 1050×420 = 높이는 폭의 0.4). 글 뒤에 깔면 글자에 가려 마크가 읽히지
+     않는다. 글 묶음은 섹션 정가운데(위아래 여백 같게) — 아래 여백에 마크 높이를 더하면 글이 위로
+     쏠려 보인다. 그 대신 설명 끝줄이 마크 윗가장자리와 조금 겹치지만 글이 마크 위에 그려진다 */
+  .contact { --dots-bottom: 4px; --dots-w: calc(100vw + 28px); }
+  .screen-end > .contact {
+    min-height: 0;
+    padding: clamp(44px, 6svh, 60px) 0;
+  }
+  .contact__dots {
+    right: auto; left: 50%; top: auto; bottom: var(--dots-bottom); transform: translateX(-50%);
+    width: var(--dots-w); height: auto; opacity: .14;
+  }
+  .contact__wrap { gap: 24px; }
+  .contact__title { font-size: clamp(36px, 10.4vw, 46px); line-height: 1.2; }
+  .contact__title br { display: none; }
+  .contact__lead { font-size: 18px; line-height: 1.7; }
+
+
+  /* ---- 푸터 — 마크업은 네 페이지 공통 구조 그대로 두고(메모: 푸터 통일), 모바일에서만
+     로고를 맨 위로 올리고 회사·주소·연락 세 묶음에 작은 이름표를 붙인다 ---- */
+  .ftr__wrap { display: flex; flex-direction: column; gap: 20px; }
+  .ftr__brand { order: -1; }
+  .ftr__col { gap: 0; }
+  .ftr__meta { flex-direction: column; gap: 0; }
+  .ftr__meta p { position: relative; padding-left: 52px; font-size: 14.5px; line-height: 1.8; color: var(--muted); }
+  .ftr__meta p::before {
+    position: absolute; left: 0; top: 0;
+    font-size: 13px; font-weight: 700; color: var(--ink);
+  }
+  .ftr__meta:first-child p:first-child::before { content: "회사"; }
+  .ftr__meta + .ftr__meta { margin-top: 10px; }
+  .ftr__meta + .ftr__meta p:first-child::before { content: "주소"; }
+  .ftr__meta + .ftr__meta p:nth-child(2) { margin-top: 10px; }
+  .ftr__meta + .ftr__meta p:nth-child(2)::before { content: "연락"; }
+  .ftr__copy { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; }
+}
+
+@media (max-width: 759.98px) and (prefers-reduced-motion: reduce) {
+  .hdr__nav, .hdr__nav a, .hdr__menu span, .step, .step::before { transition: none; }
+}
+
+
+/* =========================================================
+   자간 — 디자인의 titleTracking / bodyTracking 인스펙터 값
+   저장된 값: 제목 +0.02em, 본문 0em.
+   촘촘한 자간으로 되돌리려면 이 블록만 지우면 됨.
+   ========================================================= */
+h1, h2, h3 { letter-spacing: .02em; }
+p, span, a, li, figcaption, button, th, td, label, input { letter-spacing: 0; }

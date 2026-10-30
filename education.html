@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>교육 — (주)오름에듀테크</title>
+<meta name="description" content="오름에듀테크의 교육 사업 — EBS 자기주도학습센터 운영, 학습 코칭 중심 멘토링, 공공 교육 서비스 운영을 기획부터 현장까지 수행합니다.">
+<script>
+  // 모션 가능한 환경에서만 등장 전 숨김 상태를 켬 — 첫 페인트 전에 적용해 깜빡임 방지.
+  if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.documentElement.classList.add("motion");
+  }
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="education.css">
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <div class="hdr__inner">
+    <a href="index.html" class="hdr__brand">
+      <img src="assets/logo.png" alt="오름에듀테크">
+    </a>
+    <!-- 좁은 화면(760px 미만)에서는 같은 nav 가 전체 화면 메뉴가 되고, 이 버튼이 연다 (메인과 같은 구조) -->
+    <nav class="hdr__nav" id="hdrNav">
+      <a href="history.html">회사소개</a>
+      <a href="#top" class="is-current" aria-current="page">교육</a>
+      <a href="system.html">시스템</a>
+      <a href="apps.html">앱</a>
+    </nav>
+    <button type="button" class="hdr__menu" id="hdrMenu" aria-controls="hdrNav" aria-expanded="false" aria-label="메뉴 열기">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- 섹션 바로가기 (011) — 동작은 education.js setupSideNav -->
+<nav class="snav" data-snav aria-label="섹션 바로가기">
+  <a href="#ebs"><span class="snav__no">01</span><span class="snav__label">EBS 자기주도학습센터</span></a>
+  <a href="#mentoring"><span class="snav__no">02</span><span class="snav__label">멘토링 사업</span></a>
+  <a href="#service"><span class="snav__no">03</span><span class="snav__label">교육 서비스 운영</span></a>
+  <a href="#material"><span class="snav__no">04</span><span class="snav__label">교육 자료 개발</span></a>
+  <a href="#online"><span class="snav__no">05</span><span class="snav__label">온라인 콘텐츠 개발</span></a>
+</nav>
+
+<!-- ============ HERO — 기울어진 3D 사진 스택 ============ -->
+<section id="top" class="ehero">
+  <!-- 필름 그레인용 노이즈. 화면에 그릴 게 없는 정의부라 크기를 0으로 둔다 -->
+  <svg class="ehero__filterdef" aria-hidden="true">
+    <filter id="edu-grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </svg>
+
+  <div class="ehero__stage">
+    <!-- 세 겹 사진판. 각 판의 translateZ 와 캔버스 회전은 education.js 가 마우스에 맞춰 넣는다 -->
+    <div class="ehero__canvas" id="eheroCanvas">
+      <div class="ehero__layer ehero__layer--1" data-layer></div>
+      <div class="ehero__layer ehero__layer--2" data-layer></div>
+      <div class="ehero__layer ehero__layer--3" data-layer></div>
+      <!-- 사진판 위로 120px 떠 있는 동심원 격자 -->
+      <div class="ehero__rings" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div class="ehero__vignette" aria-hidden="true"></div>
+  <div class="ehero__grain" aria-hidden="true"></div>
+
+  <div class="ehero__content">
+    <p class="ehero__brand">OREUM EDUTECH</p>
+    <nav class="ehero__index" aria-label="교육 사업 목차">
+      <a href="#ebs"><span>01</span>EBS 자기주도학습센터</a>
+      <a href="#mentoring"><span>02</span>멘토링 사업</a>
+      <a href="#service"><span>03</span>교육 서비스 운영</a>
+      <a href="#material"><span>04</span>교육 자료 개발</a>
+      <a href="#online"><span>05</span>온라인 콘텐츠 개발</a>
+    </nav>
+    <h1 class="ehero__title">현장에서<br>직접 만들어가는 <br>교육환경</h1>
+    <p class="ehero__tag">[ EDUCATION ]</p>
+  </div>
+
+  <div class="ehero__hint" aria-hidden="true"></div>
+</section>
+
+<!-- ============ 01 EBS 자기주도학습센터 ============ -->
+<section id="ebs" class="edu edu--first">
+  <div class="edu__head">
+    <div class="edu__headline" data-reveal>
+      <span class="edu__no">01</span>
+      <h2 class="edu__title">EBS<br>자기주도학습센터</h2>
+    </div>
+    <p class="edu__lead" data-reveal>전국 자기주도학습센터의 운영부터 학습 관리까지 총괄하며, 데이터 기반 맞춤형 학습 지원 모델을 지원합니다.</p>
+  </div>
+
+  <div class="edu__row edu__row--lead">
+    <div class="edu__fig edu__fig--vig" data-reveal>
+      <img src="assets/slots/edu-ebs-1.webp" alt="EBS 자기주도학습센터 간판이 걸린 건물 외관" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <p class="edu__body" data-reveal>지역 간 교육 여건의 불균형으로 인해 발생하는 학습 기회의 격차와 시간·비용 부담을 완화하기 위해, 지역 특성에 맞는 학습 공간을 조성하고 EBS 콘텐츠를 활용한 공교육 연계 자기주도 학습 환경을 지원합니다.</p>
+      <p class="edu__body" data-reveal>교육개혁 과제 및 EBS·한국장학재단 프로그램, 지역 교육 자원을 연계하여 학교 안팎 학습을 종합적으로 지원하고, 학습 코디네이터와 다양한 교육·학습 프로그램이 제공되는 센터를 구축함으로써 지역 교육 발전에 기여하는 것을 최우선 과제로 합니다.</p>
+    </div>
+  </div>
+
+  <div class="edu__row">
+    <div class="edu__fig edu__fig--right edu__fig--map" data-reveal>
+      <!-- 지도는 확대해서 쓰므로 넘치는 부분을 자를 전용 상자가 필요하다 -->
+      <div class="edu__mapclip">
+        <img class="edu__mapimg" src="assets/korea-map-3d.jpg" alt="전국 센터 분포 지도" loading="lazy" decoding="async">
+      </div>
+      <div class="edu__mappanel">
+        <p class="edu__mapttl">센터 환경 분석</p>
+        <div class="edu__mapitem edu__mapitem--ruled">
+          <span class="edu__mapno">01</span>
+          <p>전국 100개 센터의<br>정밀 교육 환경 진단 완료</p>
+        </div>
+        <div class="edu__mapitem">
+          <span class="edu__mapno">02</span>
+          <p>사교육 참여율 및 학업성취도 기반<br>학생 환경 분석</p>
+        </div>
+      </div>
+    </div>
+    <div class="edu__txt">
+      <h3 class="edu__h3" data-reveal>운영 현황</h3>
+      <div class="edu__table" data-reveal>
+        <div class="edu__trow">
+          <span class="edu__tk">전국 운영센터</span>
+          <span class="edu__tv">100개</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__tk">참여 학생</span>
+          <span class="edu__tv">4,860명</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__tk">센터 유형 · 학교형</span>
+          <span class="edu__tv">52개소</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__tk">센터 유형 · 도서관형</span>
+          <span class="edu__tv">15개소</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__tk">센터 유형 · 센터형</span>
+          <span class="edu__tv">36개소</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="edu__row">
+    <div class="edu__fig" data-reveal>
+      <img src="assets/ebs-governance.jpg" alt="성장 중심 학습 거버넌스 — EBS 교육 콘텐츠, 학생·학부모, 학습 코디네이터" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <h3 class="edu__h3" data-reveal>운영 체계</h3>
+      <p class="edu__body edu__body--h3" data-reveal>EBS 학습 콘텐츠 – 학생/학부모 – 학습 코디네이터가 하나의 흐름으로 연결되는 '성장 중심 학습 거버넌스'를 운영합니다.</p>
+      <p class="edu__body" data-reveal>실시간 학습 데이터와 학습 코디네이터의 자기주도학습 코칭을 통해 학생의 학습을 정교하게 설계합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 멘토링 사업 ============ -->
+<section id="mentoring" class="edu">
+  <div class="edu__head">
+    <div class="edu__headline" data-reveal>
+      <span class="edu__no">02</span>
+      <h2 class="edu__title">멘토링 사업</h2>
+    </div>
+    <p class="edu__lead" data-reveal>단순한 학습 지원을 넘어, 학생이 스스로 목표를 세우고 실행하며 성찰하는 과정을 돕는 학습 코칭 중심의 멘토링 모델입니다.</p>
+  </div>
+
+  <div class="edu__row edu__row--lead">
+    <div class="edu__fig edu__fig--vig" data-reveal>
+      <img src="assets/slots/edu-mentor-1.webp" alt="1318 on 코칭 — 경기도청 청소년 화상 학습 코칭 서비스" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <p class="edu__body" data-reveal>13년간 이어온 멘토링 사업 운영 경험을 기반으로, 학습 동기 부여, 정서적 지지, 학습 관리 코칭 등 멘토링의 핵심 요소를 체계화했습니다.</p>
+      <p class="edu__body" data-reveal>여기에 EBS AI 코스웨어 기반 진단 시스템을 접목하여 학생 개개인의 학습 수준과 취약 영역을 분석하고, 맞춤형 커리큘럼을 제공합니다.</p>
+    </div>
+  </div>
+
+  <div class="edu__row">
+    <div class="edu__fig edu__fig--right edu__fig--vig" data-reveal>
+      <img src="assets/slots/edu-mentor-2.webp" alt="경기도와 EBS가 함께하는 1318 ON 코칭 홍보 이미지" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <h3 class="edu__h3" data-reveal>멘토의 학습 코칭</h3>
+      <ol class="edu__flow" data-reveal>
+        <li><span class="edu__flowname">학습플래너</span><span class="edu__flowsub">작성 · 점검</span></li>
+        <li><span class="edu__flowname">학습 전략</span><span class="edu__flowsub">수립</span></li>
+        <li><span class="edu__flowname">오답 관리</span><span class="edu__flowsub">취약 영역 보완</span></li>
+        <li><span class="edu__flowname">학습 습관</span><span class="edu__flowsub">형성 코칭</span></li>
+      </ol>
+      <p class="edu__body edu__body--after" data-reveal>참여형 활동을 통해 학습 자존감과 지속 동기를 강화합니다.</p>
+      <p class="edu__body" data-reveal>그 결과 교과 성취도뿐 아니라 자기주도학습 역량과 학습 지속력이 함께 성장하는 구조를 구현합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 교육 서비스 운영 ============ -->
+<section id="service" class="edu">
+  <div class="edu__head">
+    <div class="edu__headline" data-reveal>
+      <span class="edu__no">03</span>
+      <h2 class="edu__title">교육 서비스 운영</h2>
+    </div>
+    <p class="edu__lead edu__lead--line" data-reveal>다양한 공공 교육 사업을 운영하며 폭넓은 교육 서비스 경험을 축적해왔습니다.</p>
+  </div>
+
+  <div class="edu__row edu__row--lead">
+    <div class="edu__fig" data-reveal>
+      <img src="assets/slots/edu-service-1.png" alt="함께 배우고, 함께 성장하는 멘토링 플랫폼" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <p class="edu__body" data-reveal>디지털 역량 강화, 코딩·SW 교육, 콘텐츠 산업 전문 교육 등 서로 다른 분야를 다루지만, 공통적으로 교육 기획부터 콘텐츠 제작, 현장 운영까지 전 과정을 수행하는 통합 운영 체계를 기반으로 합니다.</p>
+    </div>
+  </div>
+
+  <div class="edu__row">
+    <div class="edu__fig edu__fig--right" data-reveal>
+      <img src="assets/slots/edu-service-2.webp" alt="디지털새싹 캠프, 호남 IS 코딩챌린지, K-Comics 아카데미 모집 포스터" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <h3 class="edu__h3" data-reveal>대표 운영 사업</h3>
+      <div class="edu__table" data-reveal>
+        <div class="edu__trow">
+          <span class="edu__pname">디지털새싹</span>
+          <span class="edu__porg">한국과학창의재단</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__pname">K-Comics 아카데미</span>
+          <span class="edu__porg">한국만화영상진흥원</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__pname">1318온코칭</span>
+          <span class="edu__porg">경기도교육청</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__pname">육군교육사령부 차세대교육시스템</span>
+          <span class="edu__porg">육군교육사령부</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__pname">독거노인재단 교육플랫폼</span>
+          <span class="edu__porg">독거노인재단</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 교육 자료 개발 (009) ============
+     사진은 010 에서 디자인 이미지 슬롯에 들어온 것. -->
+<section id="material" class="edu">
+  <div class="edu__head">
+    <div class="edu__headline" data-reveal>
+      <span class="edu__no">04</span>
+      <h2 class="edu__title">교육 자료 개발</h2>
+    </div>
+    <p class="edu__lead" data-reveal>자기주도학습 프로그램과 멘토링 운영 경험을 바탕으로, 각 프로그램의 목적에 맞는 교육 자료를 직접 기획하고 제작합니다.</p>
+  </div>
+
+  <div class="edu__row edu__row--lead">
+    <div class="edu__fig" data-reveal>
+      <img src="assets/slots/edu-material-1.webp" style="object-position:50% 63.9%" alt="Lv. UP 학습 플래너 속지 구성" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <p class="edu__body" data-reveal>단순한 수업 운영을 넘어, 학습 목표에 맞춘 교안과 지도안을 체계적으로 설계하고 현장에서 바로 활용할 수 있는 수업 콘텐츠로 구현합니다.</p>
+      <p class="edu__body" data-reveal>학습자의 수준과 교육 목적에 맞는 단계별 학습 흐름을 구조화합니다.</p>
+    </div>
+  </div>
+
+  <div class="edu__row">
+    <div class="edu__fig edu__fig--right" data-reveal>
+      <img src="assets/slots/edu-material-2.webp" class="edu__crop" style="width:111.71%;height:110.21%;left:-6.70%;top:-4.95%" alt="EBS 자기주도학습센터 노트·바인더·필기구 교구 세트" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <h3 class="edu__h3" data-reveal>주요 설계 자료</h3>
+      <div class="edu__table" data-reveal>
+        <div class="edu__trow">
+          <span class="edu__pname">자기주도학습 교안</span>
+          <span class="edu__porg">자기주도학습센터</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__pname">멘토링 프로그램 지도안</span>
+          <span class="edu__porg">멘토링 사업</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__pname">교과 연계 수업안</span>
+          <span class="edu__porg">학교 수업</span>
+        </div>
+      </div>
+      <p class="edu__body edu__body--after" data-reveal>교육 운영 현장에서 쌓은 노하우와 콘텐츠 개발 역량을 결합해, 현장 적용성과 완성도를 모두 갖춘 교육 자료를 지속적으로 개발하고 있습니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 온라인 콘텐츠 개발 (009) ============ -->
+<section id="online" class="edu">
+  <div class="edu__head">
+    <div class="edu__headline" data-reveal>
+      <span class="edu__no">05</span>
+      <h2 class="edu__title">온라인 콘텐츠 개발</h2>
+    </div>
+    <p class="edu__lead" data-reveal>다양한 주제의 온라인 교육 콘텐츠를 자체 기획·개발하고 운영합니다.</p>
+  </div>
+
+  <div class="edu__row edu__row--lead">
+    <div class="edu__fig" data-reveal>
+      <img src="assets/slots/edu-online-1.jpg" alt="교실 멘토링을 꿈꾸는 교사 가이드 콘텐츠" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <p class="edu__body" data-reveal>단순히 콘텐츠를 유통하는 데 그치지 않고, 교육 목적에 맞는 교안 및 지도안을 체계적으로 설계하고, 현장에서 바로 활용할 수 있도록 개발합니다.</p>
+      <ol class="edu__steps" data-reveal>
+        <li><span>STEP 1</span>커리큘럼 설계</li>
+        <li><span>STEP 2</span>콘텐츠 제작</li>
+        <li><span>STEP 3</span>운영 관리</li>
+        <li><span>STEP 4</span>매뉴얼·안내 영상</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="edu__row">
+    <div class="edu__fig edu__fig--right" data-reveal>
+      <img src="assets/slots/edu-online-2.jpg" alt="AI 시대 살아남는 나만의 미래직업 만들기 — 온라인 교육 콘텐츠" loading="lazy" decoding="async">
+    </div>
+    <div class="edu__txt">
+      <h3 class="edu__h3" data-reveal>제작·운영 콘텐츠</h3>
+      <div class="edu__table" data-reveal>
+        <div class="edu__trow">
+          <span class="edu__pname">EBS 교육 콘텐츠</span>
+          <span class="edu__porg">EBS</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__pname">학교폭력예방 교육 콘텐츠</span>
+          <span class="edu__porg">한국청소년정책연구원</span>
+        </div>
+        <div class="edu__trow">
+          <span class="edu__pname">K-Comics 아카데미 온라인 교육 영상</span>
+          <span class="edu__porg">한국만화영상진흥원</span>
+        </div>
+      </div>
+      <p class="edu__body edu__body--after" data-reveal>콘텐츠와 연계된 사용자 매뉴얼과 안내 영상도 함께 제작해, 학습자와 운영자가 콘텐츠를 효과적으로 활용할 수 있도록 지원합니다.</p>
+    </div>
+  </div>
+</section>
+
+<div class="edu__tail"></div>
+
+<footer class="eftr">
+  <div class="eftr__inner">
+    <div class="eftr__col">
+      <div class="eftr__meta">
+        <p>(주)오름에듀테크</p>
+        <p>대표이사 박성규</p>
+        <p>사업자등록번호 686-81-01781</p>
+      </div>
+      <div class="eftr__meta">
+        <p>서울특별시 서초구 서초중앙로 40-8 베스트원빌딩 2층</p>
+        <p>TEL 1555-7998</p>
+        <p>FAX 02-6949-2205</p>
+        <p>orm@ormedu.co.kr</p>
+      </div>
+      <p class="eftr__copy">© 2026 OREUM EDUTECH Corp.</p>
+    </div>
+    <div class="eftr__brand">
+      <img src="assets/logo.png" alt="오름에듀테크" loading="lazy">
+    </div>
+  </div>
+</footer>
+
+<script src="education.js"></script>
+</body>
+</html>

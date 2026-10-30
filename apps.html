@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>앱 — (주)오름에듀테크</title>
+<meta name="description" content="오름에듀테크는 웹사이트를 넘어 교육 현장에 필요한 앱까지 직접 기획하고 개발합니다. 학습 플래너 앱 플랜온, 과외 플랫폼 쌤핏, 대입 정보 플랫폼 대학어디가 출시 예정.">
+<script>
+  // 모션 가능한 환경에서만 등장 전 숨김 상태를 켬 — 첫 페인트 전에 적용해 깜빡임 방지.
+  if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.documentElement.classList.add("motion");
+  }
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="apps.css">
+</head>
+<body>
+
+<!-- 헤더는 다른 페이지와 같게 등장 애니메이션 없이 처음부터 서 있다. -->
+<header class="hdr" id="hdr">
+  <div class="hdr__inner">
+    <a href="index.html" class="hdr__brand">
+      <img src="assets/logo.png" alt="오름에듀테크">
+    </a>
+    <!-- 좁은 화면(760px 미만)에서는 같은 nav 가 전체 화면 메뉴가 되고, 이 버튼이 연다 (메인과 같은 구조) -->
+    <nav class="hdr__nav" id="hdrNav">
+      <a href="history.html">회사소개</a>
+      <a href="education.html">교육</a>
+      <a href="system.html">시스템</a>
+      <a href="#top" class="is-current" aria-current="page">앱</a>
+    </nav>
+    <button type="button" class="hdr__menu" id="hdrMenu" aria-controls="hdrNav" aria-expanded="false" aria-label="메뉴 열기">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ============ HERO — 청록 배경 + 자기장 버블 ============ -->
+<section id="top" class="ahero">
+  <div class="ahero__deco" aria-hidden="true">
+    <!-- 반짝이는 점은 app.js 가 뿌린다 (씨드 고정이라 새로고침해도 같은 배치) -->
+    <div class="ahero__sparks" id="aheroSparks"></div>
+    <div class="ahero__grid"></div>
+    <div class="ahero__glow ahero__glow--mint"></div>
+    <div class="ahero__glow ahero__glow--deep"></div>
+    <img class="ahero__dots" src="assets/orm-dots.png" alt="">
+    <div class="ahero__ring ahero__ring--outer"></div>
+    <div class="ahero__ring ahero__ring--inner"></div>
+
+    <!-- 커서가 가까워지면 끌려오며 부푸는 버블. 장식층은 pointer-events:none 이지만
+         이 넷만 auto 로 되살려 마우스를 받는다. -->
+    <div class="ahero__bub ahero__bub--1" data-bubble>&lt;/&gt;</div>
+    <div class="ahero__bub ahero__bub--2" data-bubble>AI</div>
+    <div class="ahero__bub ahero__bub--3" data-bubble>{ }</div>
+    <div class="ahero__bub ahero__bub--4" data-bubble>APP</div>
+
+    <span class="ahero__star ahero__star--1" data-twinkle></span>
+    <span class="ahero__star ahero__star--2" data-twinkle></span>
+    <span class="ahero__star ahero__star--3" data-twinkle></span>
+    <span class="ahero__star ahero__star--4" data-twinkle></span>
+  </div>
+
+  <div class="ahero__content">
+    <h1 class="ahero__title" data-rise style="--d:0ms">배움의 다음 순간,<br>우리의 손안에서 시작됩니다</h1>
+    <p class="ahero__lead" data-rise style="--d:90ms">웹사이트를 넘어, 현장에 필요한 앱까지 직접 기획하고 개발합니다</p>
+  </div>
+</section>
+
+<!-- ============ 앱 01 — 플래너 앱 ============ -->
+<section id="app-1" class="app app--bleed">
+  <div class="app__inner">
+    <div class="app__txt app__txt--gutter">
+      <div class="app__badges" data-reveal>
+        <span class="app__pill">출시 예정</span>
+        <span class="app__cat">EBS 자기주도학습센터 플래너 앱</span>
+      </div>
+      <h2 class="app__title" data-reveal>플랜온</h2>
+      <p class="app__sub" data-reveal>학생의 자기주도학습을 돕기 위한 학습 플래너 앱</p>
+
+      <!-- 3단계. 마우스를 올린 단계의 번호 동그라미가 채워진다 (기본값 01) -->
+      <div class="app__steps" id="appSteps" data-reveal>
+        <span class="app__steps-line" aria-hidden="true"></span>
+        <div class="app__step is-on">
+          <span class="app__stepno">01</span>
+          <div class="app__stepbody">
+            <p class="app__stepttl">주간 계획</p>
+            <p class="app__steptxt">학생이 스스로 한 주의 학습 계획을 세웁니다</p>
+          </div>
+        </div>
+        <div class="app__step">
+          <span class="app__stepno">02</span>
+          <div class="app__stepbody">
+            <p class="app__stepttl">실행</p>
+            <p class="app__steptxt">체크리스트와 타이머로 계획을 실제 학습 행동으로 옮깁니다</p>
+          </div>
+        </div>
+        <div class="app__step">
+          <span class="app__stepno">03</span>
+          <div class="app__stepbody">
+            <p class="app__stepttl">기록 분석</p>
+            <p class="app__steptxt">학습 리포트와 코디네이터 코멘트로 동기부여를 이어갑니다</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="app__date" data-reveal>출시 예정일 · 2027년</p>
+    </div>
+
+    <!-- 15도 기울인 3열. 가운데 열만 반대로 흐른다. 이동은 app.js 가 매 프레임 계산 -->
+    <div class="app__shots" data-reveal>
+      <div class="app__shots-stage">
+        <div class="app__col">
+          <div class="app__track" data-track>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p1.png')"></span>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p8.png')"></span>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p5.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p1.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p8.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p5.png')"></span>
+          </div>
+        </div>
+        <div class="app__col">
+          <div class="app__track" data-track>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p2.png')"></span>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p9.png')"></span>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p7.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p2.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p9.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p7.png')"></span>
+          </div>
+        </div>
+        <div class="app__col">
+          <div class="app__track" data-track>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p3.png')"></span>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p10.png')"></span>
+            <span role="img" aria-label="플래너 앱 화면" style="background-image:url('assets/planner/p11.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p3.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p10.png')"></span>
+            <span role="img" aria-hidden="true" style="background-image:url('assets/planner/p11.png')"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 앱 02 — 쌤핏 (007.zip) ============ -->
+<section id="app-2" class="app app--tint app--fixed">
+  <div class="app__inner app__inner--boxed app__inner--snug">
+    <div class="app__txt">
+      <div class="app__badges" data-reveal>
+        <span class="app__pill">출시 예정</span>
+        <span class="app__cat">과외 플랫폼</span>
+      </div>
+      <h2 class="app__title" data-reveal>쌤핏</h2>
+      <p class="app__sub" data-reveal>매칭을 넘어, 사후관리까지 이어지는 과외 플랫폼</p>
+
+      <!-- 아코디언. 마우스를 올리거나 누른 항목만 설명이 펼쳐진다 (기본값 첫 항목) -->
+      <div class="app__acc" id="appAcc" data-reveal>
+        <button type="button" class="app__acc-item is-on" aria-expanded="true">
+          <span class="app__acc-ttl">맞춤 매칭</span>
+          <span class="app__acc-wrap"><span><span class="app__acc-txt">과목·성향·일정을 기준으로 나에게 맞는 선생님을 연결합니다</span></span></span>
+        </button>
+        <button type="button" class="app__acc-item" aria-expanded="false">
+          <span class="app__acc-ttl">수업 관리</span>
+          <span class="app__acc-wrap"><span><span class="app__acc-txt">수업 일정과 숙제, 진도를 한곳에서 함께 관리합니다</span></span></span>
+        </button>
+        <button type="button" class="app__acc-item" aria-expanded="false">
+          <span class="app__acc-ttl">지속 관리</span>
+          <span class="app__acc-wrap"><span><span class="app__acc-txt">수업 후 피드백과 성적 변화를 기록해 꾸준히 관리합니다</span></span></span>
+        </button>
+      </div>
+
+      <p class="app__date" data-reveal>출시 예정일 · 2027년</p>
+    </div>
+
+    <!-- 휴대폰 두 대. 둥실거림과 호버 시 벌어짐은 apps.js 가 transform 으로 얹는다.
+         A(수업 현황 분석)가 앞, B(오늘 수업 일정)가 뒤. -->
+    <div class="app__phones" id="appPhones" data-reveal>
+      <span class="app__phones-glow" aria-hidden="true"></span>
+      <div class="app__phone-a">
+        <div class="app__phone-a-tilt">
+          <img src="assets/app2-phone-tilt.png" alt="수업 현황 분석 화면" loading="lazy">
+        </div>
+      </div>
+      <img class="app__phone-b" src="assets/app2-phone-front.png" alt="오늘 수업 일정 홈 화면" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- ============ 앱 03 — 대학어디가 (008.zip) ============ -->
+<section id="app-3" class="app app--fixed">
+  <div class="app__inner app__inner--boxed app__inner--snug">
+    <div class="app__txt">
+      <div class="app__badges" data-reveal>
+        <span class="app__pill">출시 예정</span>
+        <span class="app__cat">대입 정보 플랫폼</span>
+      </div>
+      <h2 class="app__title" data-reveal>대학어디가</h2>
+      <p class="app__sub app__sub--keep" data-reveal>성적 입력 한 번으로, 전공 찾기부터 합격 후기까지</p>
+
+      <div class="app__feats" data-reveal>
+        <div class="app__feat">
+          <p class="app__feat-ttl">전공찾기</p>
+          <p class="app__feat-txt">적성검사와 관심사를 바탕으로 나에게 맞는 전공을 추천합니다</p>
+        </div>
+        <div class="app__feat">
+          <p class="app__feat-ttl">학과정보</p>
+          <p class="app__feat-txt">전형정보부터 반영교과, 작년 합격선까지 학과 하나로 확인합니다</p>
+        </div>
+        <div class="app__feat">
+          <p class="app__feat-ttl">합격예측</p>
+          <p class="app__feat-txt">모의고사와 내신 성적으로 안정·적정·도전 대학을 분류합니다</p>
+        </div>
+        <div class="app__feat">
+          <p class="app__feat-ttl">대입후기</p>
+          <p class="app__feat-txt">성적이 인증된 선배들의 합격 후기만 모아 보여줍니다</p>
+        </div>
+      </div>
+
+      <p class="app__date" data-reveal>출시 예정일 · 2027년</p>
+    </div>
+
+    <!-- 부채꼴 3D 캐러셀. 가운데가 앞, 양옆은 비스듬히 뒤로, 나머지 하나는 앞 폰 뒤에 숨긴다.
+         배치·자동 넘김은 apps.js. 마우스를 올리면 멈춘다. -->
+    <div class="app__car" data-reveal>
+      <div class="app__car-stage" id="appCar">
+        <button type="button" class="app__car-phone" aria-label="학과 정보 화면"><span style="background-image:url('assets/app3/s1.png')"></span></button>
+        <button type="button" class="app__car-phone" aria-label="합격예측 화면"><span style="background-image:url('assets/app3/s2.png')"></span></button>
+        <button type="button" class="app__car-phone" aria-label="계열 정보 화면"><span style="background-image:url('assets/app3/s3.png')"></span></button>
+        <button type="button" class="app__car-phone" aria-label="대입후기 화면"><span style="background-image:url('assets/app3/s4.png')"></span></button>
+        <div class="app__car-dots" id="appCarDots">
+          <button type="button" aria-label="학과 정보 화면"></button>
+          <button type="button" aria-label="합격예측 화면"></button>
+          <button type="button" aria-label="계열 정보 화면"></button>
+          <button type="button" aria-label="대입후기 화면"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="aftr">
+  <div class="aftr__inner">
+    <div class="aftr__col">
+      <div class="aftr__meta">
+        <p>(주)오름에듀테크</p>
+        <p>대표이사 박성규</p>
+        <p>사업자등록번호 686-81-01781</p>
+      </div>
+      <div class="aftr__meta">
+        <p>서울특별시 서초구 서초중앙로 40-8 베스트원빌딩 2층</p>
+        <p>TEL 1555-7998</p>
+        <p>FAX 02-6949-2205</p>
+        <p>orm@ormedu.co.kr</p>
+      </div>
+      <p class="aftr__copy">© 2026 OREUM EDUTECH Corp.</p>
+    </div>
+    <div class="aftr__brand">
+      <img src="assets/logo.png" alt="오름에듀테크" loading="lazy">
+    </div>
+  </div>
+</footer>
+
+<script src="apps.js"></script>
+</body>
+</html>

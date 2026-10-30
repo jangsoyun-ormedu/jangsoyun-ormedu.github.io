@@ -1,0 +1,590 @@
+/* =========================================================
+   오름에듀테크 — 연혁 페이지
+   디자인 원본: zipfiles/009.zip · untitled/project/오름에듀테크 연혁.dc.html
+
+   헤더는 사이트 공통 규격(1400px · 불투명도 80% + 블러 20px)을 따르고, 원본처럼
+   '연혁'을 헤더 맨 위 항목으로 두지 않고 회사소개 드롭다운(navmenu.css) 안에 넣었다.
+   자간은 인라인 값이 그대로 렌더값이다(원본에 자간 주입 스크립트가 없다).
+   ========================================================= */
+
+:root {
+  --ink:    #15171a;
+  --teal:   #00908c;
+  --accent: #1aaeb0;
+  --mint:   #4fded8;
+  --gray:   #8b8e95;
+  --muted:  #55585f;
+  --line:   #ececea;
+  --dark:   #0d0f11;
+  --hdr-h:  68px;
+  --pagew:  1400px;
+  --gutter: clamp(20px, 4vw, 56px);
+}
+/* 2026-10-30: PC 상단 GNB 20% 키움 — 높이 68 → 82px, 로고 24 → 29px, 메뉴 글자 15 → 18px, 간격 22 → 26px.
+   휴대폰(759.98px 이하)은 따로 정한 값(84px 헤더·전체 화면 메뉴)을 그대로 쓴다 */
+@media (min-width: 760px) { :root { --hdr-h: 82px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+html { scroll-behavior: smooth; }
+a { color: var(--ink); text-decoration: none; }
+a:hover { color: var(--teal); }
+::selection { background: #c9f2f0; }
+img { border-style: none; }
+
+
+/* ============ 헤더 (사이트 공통) ============ */
+
+.hdr {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 80;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transform: translateY(0);
+  transition: transform .3s ease, background .35s ease, border-color .35s ease, backdrop-filter .35s ease;
+}
+.hdr__inner {
+  max-width: var(--pagew); margin: 0 auto; padding: 0 var(--gutter);
+  height: var(--hdr-h);
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.hdr__brand { display: flex; align-items: center; flex-shrink: 0; }
+.hdr__brand img { height: 29px; width: auto; display: block; filter: brightness(0) invert(1); transition: filter .35s ease; }
+.hdr__nav { display: flex; align-items: center; gap: 26px; color: #fff; transition: color .35s ease; }
+.hdr__nav a { color: inherit; font-size: 18px; font-weight: 600; opacity: .6; transition: opacity .2s ease; }
+.hdr__nav a:hover { opacity: 1; color: inherit; }
+.hdr__nav a.is-current { font-weight: 700; opacity: 1; }
+
+.hdr.is-past { background: rgba(255,255,255,.8); backdrop-filter: blur(20px); border-bottom-color: var(--line); }
+.hdr.is-past .hdr__brand img { filter: none; }
+.hdr.is-past .hdr__nav { color: var(--ink); }
+.hdr.is-hidden { transform: translateY(-100%); }
+
+/* 메뉴 버튼 — 넓은 화면에서는 쓰지 않는다. 좁은 화면 규칙은 맨 아래 '좁은 화면' 블록에 */
+.hdr__menu { display: none; }
+
+
+/* ============ HERO ============ */
+
+.hhero {
+  position: relative; display: flex;
+  min-height: 100svh;
+  background: var(--dark); color: #fff;
+  overflow: hidden;
+}
+
+/* 스크립트가 없을 때 보이는 첫 장. history.js 가 그 위에 기둥을 세운다 */
+.hhero__media {
+  position: absolute; inset: 0; z-index: 0;
+  background: url("assets/hero-ocheon.jpg") center / cover no-repeat;
+}
+.hhero__col {
+  position: absolute; top: 0; bottom: 0; overflow: hidden;
+  perspective: 1800px;
+}
+/* overflow:hidden 이 핵심 — 면 안의 사진은 섹션 전체 폭이라 기둥 밖으로 길게 뻗어 있다.
+   면을 자르지 않으면 회전할 때 뻗은 부분이 카메라 쪽으로 휘어 들어와 오른쪽 기둥이 깨진다 */
+.hhero__face {
+  position: absolute; inset: 0; overflow: hidden;
+  backface-visibility: hidden; transform-origin: 50% 50%;
+}
+/* 면 안의 사진은 섹션 전체 폭으로 깔고, 기둥 위치만큼 왼쪽으로 당겨 이어 붙인다 */
+.hhero__img {
+  position: absolute; top: 0; bottom: 0;
+  background-size: cover; background-position: center;
+}
+html.motion .hhero__img { animation: hheroDrift 22s ease-in-out infinite alternate; }
+@keyframes hheroDrift {
+  from { transform: scale(1.09) translate(1.6%, 1.2%); }
+  to   { transform: scale(1.09) translate(-2.6%, -2%); }
+}
+
+.hhero__scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(13,15,17,.86) 0%, rgba(13,15,17,.72) 45%, rgba(13,15,17,.55) 100%);
+}
+.hhero__rules { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.hhero__rules span { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,.16); }
+.hhero__rules span:nth-child(1) { left: 8.333%; }
+.hhero__rules span:nth-child(2) { left: 33.333%; }
+.hhero__rules span:nth-child(3) { left: 66.667%; }
+.hhero__rules span:nth-child(4) { left: 91.667%; }
+
+.hhero__inner {
+  position: relative; z-index: 2; width: 100%;
+  max-width: var(--pagew); margin: 0 auto;
+  padding: clamp(120px, 13vh, 160px) var(--gutter) clamp(36px, 5vh, 56px);
+  display: flex; flex-direction: column;
+}
+/* 원본은 이 줄을 640px 로 고정한다. 낮은 화면에서는 히어로를 넘기지 않게 줄인다 */
+.hhero__row {
+  flex: 1; height: min(640px, calc(100svh - 220px)); min-height: 360px;
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: stretch; gap: 32px;
+}
+.hhero__copy { min-width: 0; max-width: 640px; align-self: flex-end; position: relative; top: -60px; }
+.hhero__eyebrow { margin: 0; font-size: clamp(18px, 1.6vw, 21px); font-weight: 700; letter-spacing: -.02em; color: var(--mint); }
+.hhero__title {
+  margin: clamp(14px, 1.4vw, 18px) 0 0;
+  font-size: clamp(34px, 4.4vw, 100px); line-height: 1.22; letter-spacing: -.045em; font-weight: 700;
+  text-wrap: balance; color: #fff;
+}
+.hhero__lead {
+  margin: clamp(24px, 2.6vw, 36px) 0 0; max-width: 560px;
+  font-size: clamp(15px, 1.3vw, 17px); line-height: 1.8; letter-spacing: -.02em;
+  color: rgba(255,255,255,.8); text-wrap: pretty;
+}
+.hhero__since {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  margin-left: auto; align-self: flex-start;
+}
+.hhero__since p { margin: 0; }
+.hhero__since p:first-child { font-size: 13px; font-weight: 700; letter-spacing: .14em; color: rgba(255,255,255,.6); }
+.hhero__since p:last-child { font-size: clamp(15px, 1.3vw, 17px); font-weight: 600; letter-spacing: -.02em; color: #fff; }
+
+
+/* ============ 연표 ============ */
+
+.htl-wrap {
+  max-width: var(--pagew); margin: 0 auto;
+  /* 히어로 → 첫 연도 300px (원본 clamp(64px,7vw,100px) 에서 사용자 요청으로 늘림) */
+  padding: 300px var(--gutter) 0;
+}
+/* z-index 를 주지 않는다 — 구슬(z 6)이 아래 인증서 구획(어두운 판) 위로 내려가 그려져야 한다 */
+.htl { position: relative; }
+
+.htl__line, .htl__bead { display: none; }
+/* 선·점·구슬 모두 left:50% + translateX(-50%) 로 같은 중심에 세운다.
+   (선은 left:50% 에서 1px 오른쪽으로 그려지고 점은 음수 마진으로 가운데를 잡으면
+   반 픽셀씩 어긋나 화면 폭에 따라 점이 선 옆으로 비껴 보인다)
+   쌓임 순서: 선 < 해마다의 점(5) < 구슬(6). 지나온 길을 칠하는 채움선은 없다 — 구슬만 따라온다 */
+/* 선 끝은 마지막 연도 아래 흰 여백(260px, .hyr:last-child) 중간에서 흐려지며 끊긴다 —
+   내용이 끝나는 지점(100% - 260px)까지는 진하게, 그 아래 130px 동안 사라진다 */
+.htl__line {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%);
+  background-color: #e3e5e5;
+  /* 색은 background-color 로 두고(어두운 화면에서 바꾸려고) 끝부분만 마스크로 흐린다 */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 260px), transparent calc(100% - 130px));
+          mask-image: linear-gradient(to bottom, #000 calc(100% - 260px), transparent calc(100% - 130px));
+}
+
+/* 바깥은 위치만 잡는다(top 은 history.js). 움직임은 안쪽 core/ring 이 맡는다 */
+.htl__bead {
+  position: absolute; left: 50%; top: 0; z-index: 6;
+  width: 13px; height: 13px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.htl__core {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 6px rgba(26,174,176,.16);
+}
+.htl__ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 1.5px solid var(--mint);
+  opacity: 0;
+}
+
+/* 라벨에 부딪힘 — history.js 가 .is-hit 을 붙인다.
+   눌려 찌그러졌다가(착지) 살짝 튀어 오르고, 다시 내려앉은 뒤 빛으로 번지며 사라진다.
+   그 사이 파문 두 겹이 퍼진다. 라벨이 켜지는 시점(history.js hitDelay)은 첫 파문과 맞춘다. */
+.htl__bead.is-hit .htl__core { animation: beadHit 1100ms cubic-bezier(.3,.7,.3,1) forwards; }
+.htl__bead.is-hit .htl__ring { animation: beadRipple 1000ms cubic-bezier(.2,.7,.3,1) 140ms forwards; }
+.htl__bead.is-hit .htl__ring--2 { animation: beadRipple2 1300ms cubic-bezier(.2,.7,.3,1) 300ms forwards; }
+
+@keyframes beadHit {
+  0%   { transform: translateY(0) scale(1, 1); }
+  12%  { transform: translateY(3px) scale(1.45, .6); }                 /* 착지 — 눌림 */
+  32%  { transform: translateY(-14px) scale(.85, 1.18); }              /* 튀어 오름 */
+  50%  { transform: translateY(0) scale(1.18, .86); }                  /* 다시 착지 */
+  62%  { transform: translateY(-3px) scale(.96, 1.04); }
+  72%  { transform: translateY(0) scale(1); opacity: 1;
+         background: var(--mint); box-shadow: 0 0 0 6px rgba(79,222,216,.25), 0 0 18px rgba(79,222,216,.6); }
+  100% { transform: translateY(0) scale(2.6); opacity: 0;
+         background: var(--mint); box-shadow: 0 0 0 10px rgba(79,222,216,0), 0 0 40px rgba(79,222,216,0); }
+}
+@keyframes beadRipple {
+  0%   { transform: scale(1);   opacity: .9; }
+  100% { transform: scale(7);   opacity: 0; }
+}
+@keyframes beadRipple2 {
+  0%   { transform: scale(1);   opacity: .5; border-width: 1px; }
+  100% { transform: scale(12);  opacity: 0;  border-width: 1px; }
+}
+
+.hyr {
+  position: relative;
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  gap: clamp(40px, 5vw, 72px) 0;
+  padding: 0 0 clamp(72px, 8vw, 110px);
+  align-items: start;
+}
+.hyr__dot { display: none; }
+.hyr__text { min-width: 0; transition: opacity .5s ease; }
+.hyr__year {
+  margin: 0;
+  font-size: clamp(40px, 4.2vw, 56px); font-weight: 700; letter-spacing: 0; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--accent);
+  transition: color .5s ease;
+}
+.hyr__months { margin: clamp(24px, 2.6vw, 34px) 0 0; display: flex; flex-direction: column; gap: clamp(18px, 1.8vw, 22px); }
+.hyr__m { display: grid; grid-template-columns: clamp(84px, 8.4vw, 104px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.hyr__date {
+  font-size: clamp(14px, 1.25vw, 16px); font-weight: 700; letter-spacing: -.01em;
+  color: var(--muted); line-height: 1.6; font-variant-numeric: tabular-nums;
+}
+.hyr__items { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.hyr__items p { margin: 0; font-size: clamp(14px, 1.2vw, 15.5px); line-height: 1.6; letter-spacing: -.03em; font-weight: 600; text-wrap: pretty; }
+.hyr__items .hyr__tags { margin: 4px 0 2px; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.hyr__tags span { font-size: 12.5px; font-weight: 500; letter-spacing: -.02em; color: var(--gray); line-height: 1.5; }
+
+.hyr__media { min-width: 0; display: flex; justify-content: flex-start; }
+.hyr__fig {
+  width: 100%; aspect-ratio: 4/3; border-radius: 2px; overflow: hidden; background: #f1f1ef;
+  /* 밝은 사진이 흰 바탕에 묻히지 않게 두르는 얇은 선 — 교육·시스템 사진과 같은 값 */
+  outline: .5px solid rgba(21,23,26,.1); outline-offset: 0;
+}
+.hyr__fig img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: filter .6s ease, opacity .6s ease;
+}
+
+/* 빈티지 톤 — 2026·2025 사진. 색을 바래게 하고, 따뜻한 막·가장자리 그늘·필름 입자를 얹는다 */
+.hyr__fig--vintage { position: relative; }
+.hyr__fig--vintage img { filter: sepia(.05) saturate(.78) contrast(.9) brightness(1.05); }
+/* 2026 사진은 가로로 긴 원본이라 4:3 칸에서 양옆이 잘린다 — 오른쪽 끝에서 3px 안쪽을 기준으로 보여 준다 */
+#y2026 .hyr__fig img { object-position: calc(100% + 3px) 50%; }
+.hyr__fig--vintage::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 80% 75% at 50% 50%, rgba(40,25,10,0) 55%, rgba(40,25,10,.38) 100%),
+    linear-gradient(rgba(255,214,160,.12), rgba(255,214,160,.12));
+  mix-blend-mode: multiply; opacity: .9;
+  transition: opacity .6s ease;
+}
+
+/* 넓은 화면 — 가운데 선을 두고 글/사진이 좌우로 번갈아 선다 */
+@media (min-width: 900px) {
+  .htl__line, .htl__bead { display: block; }
+  .hyr { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .hyr__dot {
+    display: block; position: absolute; left: 50%; top: clamp(30px, 3vw, 40px); z-index: 5;
+    width: 7px; height: 7px; border-radius: 50%; transform: translateX(-50%);
+    /* 점 둘레의 테두리는 바탕색과 같아야 선을 끊어 주는 틈으로 보인다 — 어두운 화면에서도 따라간다 */
+    box-shadow: 0 0 0 5px var(--page-bg, #fff); background: var(--accent);
+    transition: background .45s ease, box-shadow var(--tone-dur) ease;
+  }
+  .hyr__text  { order: 0; padding: 0 clamp(40px, 5vw, 80px) 0 0; }
+  .hyr__media { order: 2; padding: 0 0 0 clamp(40px, 5vw, 80px); justify-content: flex-end; }
+  .hyr--flip .hyr__text  { order: 2; padding: 0 0 0 clamp(40px, 5vw, 80px); }
+  .hyr--flip .hyr__media { order: 0; padding: 0 clamp(40px, 5vw, 80px) 0 0; justify-content: flex-start; }
+
+  /* 구슬이 아직 닿지 않은 해 — history.js 가 .is-off 를 붙인다 */
+  .hyr.is-off .hyr__dot { background: #d3d6d8; }
+  .hyr.is-off .hyr__year { color: #c3c7ca; }
+  .hyr.is-off .hyr__text { opacity: .35; }
+  .hyr.is-off .hyr__fig img { filter: grayscale(1); opacity: .45; }
+  .hyr.is-off .hyr__fig--vintage::after { opacity: 0; }
+  body.is-dark .hyr.is-off .hyr__dot { background: #3a3e43; }
+  body.is-dark .hyr.is-off .hyr__year { color: #4a4f55; }
+}
+
+
+/* ============ 인증서 갤러리 ============ */
+
+.hcert {
+  position: relative; overflow: hidden;
+  /* 마지막 연도와의 간격은 마지막 연도의 아래 여백(260) + 바로 위 .hcert-gap(300)이 맡는다 */
+  margin: 0;
+  /* 한 화면에 꽉 차게 — 높이를 화면 높이로 잡고 내용을 세로 가운데에 모은다.
+     위아래 여백도 화면 높이(vh) 기준으로 줄었다 (원본 clamp(80px,9vw,130px) / clamp(72px,8vw,110px)).
+     카드 크기는 history.js layoutCerts 가 남는 높이에 맞춰 정한다. */
+  box-sizing: border-box; min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(48px, 8vh, 96px) 0 clamp(32px, 5vh, 64px);
+  /* 배경을 칠하지 않는다 — 어두운 판을 따로 칠하면 페이지 배경이 아직 흰색이거나 바뀌는 중일 때
+     구획 위끝이 경계선으로 드러난다. 투명하게 두고 body 의 배경(.is-dark 면 검정)을 그대로 비친다.
+     이 구획이 화면에 보이는 동안은 history.js 가 항상 .is-dark 를 유지한다. */
+  background: transparent; color: #fff;
+}
+/* 마지막 연도 → 인증서 구획 여백 합계 560px = 마지막 연도 블록의 아래 여백 260px + .hcert-gap 300px.
+   가운데 회색선은 흰 여백 중간에서 흐려지며 끊기고(.htl__line 마스크), 그 아래부터는
+   구슬만 내려간다(구슬 z-index 6). */
+.hyr:last-child { padding-bottom: 260px; }
+/* 그라데이션을 칠하지 않는다. 여백 560px 의 한가운데가 화면 중앙을 지나면 history.js 가 body 에
+   .is-dark 를 붙이고, 배경색만 --tone-dur(0.35초) 만에 검정으로 바뀐다(위로 돌아가면 다시 흰색).
+   판 자체는 투명해서 바뀐 body 배경이 그대로 비친다. */
+.hcert-gap { height: 300px; }
+
+/* ---- 어두운 화면 — 배경만 바뀌고 내용은 그대로, 글자색만 밝게 뒤집어 읽히게 둔다 ---- */
+:root { --tone-dur: .35s; }
+body { --page-bg: #fff; transition: background-color var(--tone-dur) ease; }
+body.is-dark { --page-bg: var(--dark); background-color: var(--dark); }
+
+.htl-wrap { color: var(--ink); transition: color var(--tone-dur) ease; }
+.hyr__date, .htl__line { transition: color var(--tone-dur) ease, background-color var(--tone-dur) ease; }
+body.is-dark .htl-wrap { color: #fff; }
+body.is-dark .hyr__date { color: rgba(255,255,255,.6); }
+body.is-dark .htl__line { background-color: rgba(255,255,255,.16); }
+
+.hcert__head {
+  position: relative; z-index: 1;
+  max-width: var(--pagew); margin: 0 auto; padding: 0 var(--gutter);
+  text-align: center;
+}
+.hcert__label {
+  margin: 0;
+  font-size: clamp(16px, 1.4vw, 19px); font-weight: 700; letter-spacing: -.01em;
+  color: rgba(255,255,255,.3);
+  transition: color .6s ease, text-shadow .6s ease;
+}
+.hcert__label.is-lit { color: var(--mint); text-shadow: 0 0 18px rgba(79,222,216,.55); }
+.hcert__title {
+  margin: clamp(14px, 1.4vw, 18px) 0 0;
+  /* 낮은 화면에서는 제목도 화면 높이에 맞춰 줄인다 (5.4vh — 900px 높이에서 원본 상한 52px 에 가깝다) */
+  font-size: min(clamp(30px, 3.8vw, 52px), max(26px, 5.4vh)); line-height: 1.22; letter-spacing: -.045em; font-weight: 700;
+  text-wrap: balance; color: #fff;
+}
+
+/* 제목·캐러셀 등장 — 구슬이 라벨에 부딪혀 .hcert.is-open 이 붙는 순간 아래에서 떠오른다.
+   흐림이 걷히며 올라오고, 캐러셀은 제목보다 한 박자 늦게 따라온다. */
+html.motion .hcert__title,
+html.motion .hcert__stage {
+  opacity: 0; transform: translateY(36px); filter: blur(8px);
+  transition: opacity .9s cubic-bezier(.215,.61,.355,1),
+              transform .9s cubic-bezier(.215,.61,.355,1),
+              filter .9s cubic-bezier(.215,.61,.355,1);
+}
+html.motion .hcert__stage { transform: translateY(60px); transition-delay: .18s; }
+html.motion .hcert.is-open .hcert__title,
+html.motion .hcert.is-open .hcert__stage { opacity: 1; transform: none; filter: none; }
+
+/* 높이는 history.js 가 카드 크기에 맞춰 넣는다. 양 끝은 마스크로 어둠에 녹인다 */
+.hcert__stage {
+  position: relative; z-index: 1;
+  margin: clamp(24px, 4vh, 56px) 0 0; height: 560px;
+  perspective: 1500px; touch-action: pan-y; user-select: none; cursor: grab; outline: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+.hcert__stage:active { cursor: grabbing; }
+
+.hcard {
+  all: unset; box-sizing: border-box; display: block;
+  position: absolute; left: 50%; top: 0;   /* 실제 top 은 history.js 가 넣는다 */
+  cursor: pointer; transform-origin: 50% 100%;
+}
+.hcard:focus-visible .hcard__frame { outline: 2px solid var(--mint); outline-offset: 4px; }
+.hcard__frame {
+  position: absolute; inset: 0; border-radius: 2px;
+  background: #1a1b1f; border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 24px 50px rgba(0,0,0,.5);
+  transition: border-color .5s ease, box-shadow .5s ease;
+}
+.hcard__img {
+  position: absolute; inset: 3px; border-radius: 1px;
+  background: #fff center / cover no-repeat;
+  filter: grayscale(1) brightness(.8);
+  transition: filter .9s ease;
+}
+.hcard__cap {
+  position: absolute; left: 0; right: 0; top: calc(100% + 22px);
+  padding: 0 8px; text-align: center;
+  opacity: 0; transition: opacity .4s ease;
+}
+.hcard__cap p { margin: 0; }
+.hcard__cap p:first-child { font-size: 17px; font-weight: 700; letter-spacing: -.03em; line-height: 1.4; color: #fff; text-wrap: balance; }
+/* 설명은 한 줄로 — 칸보다 길면 말줄임(…). 전문은 자세히 보기 창에 있다 */
+.hcard__cap p + p { margin-top: 8px; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.hcard.is-on .hcard__frame { border-color: rgba(255,255,255,.22); box-shadow: 0 40px 80px rgba(0,0,0,.6); }
+.hcard.is-on .hcard__cap { opacity: 1; }
+/* 가운데 카드는 눌러도 아무 일이 없다(자세히 보기를 뺐다) — 손가락 커서를 내린다 */
+.hcard.is-on { cursor: default; }
+.hcert.is-lit .hcard.is-on .hcard__img { filter: grayscale(0) brightness(1); }
+
+
+
+/* ============ 푸터 — 메인과 같은 구성, 검정 판 ============
+   인증서 구획처럼 배경을 칠하지 않는다 — 여기까지 오면 body 가 이미 검정이다.
+   글자색·선·로고만 어둡게 뒤집는다. */
+
+.hftr { background: transparent; color: #fff; border-top: 1px solid rgba(255,255,255,.08); }
+.hftr__inner {
+  max-width: var(--pagew); margin: 0 auto;
+  padding: clamp(44px, 5vw, 68px) var(--gutter) clamp(36px, 4vw, 56px);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(28px, 4vw, 64px);
+}
+.hftr__col { min-width: 0; display: flex; flex-direction: column; gap: clamp(20px, 2.4vw, 30px); }
+.hftr__meta { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.hftr__meta p { margin: 0; font-size: 13px; line-height: 1.75; color: rgba(255,255,255,.56); }
+.hftr__copy { margin: 0; font-size: 12.5px; color: rgba(255,255,255,.36); }
+.hftr__brand { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-self: end; }
+.hftr__brand img { height: 26px; width: auto; display: block; filter: brightness(0) invert(1); }
+
+
+/* ============ 등장 리빌 ============ */
+
+html.motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 800ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms),
+              transform 800ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms);
+}
+html.motion [data-reveal].is-in { opacity: 1; transform: none; }
+/* 라벨은 리빌과 함께 색·빛 번짐도 바뀐다 — 위 규칙이 transition 을 덮어쓰지 않게 다시 묶는다 */
+html.motion .hcert__label[data-reveal] {
+  transition: color .6s ease, text-shadow .6s ease,
+              opacity 800ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms),
+              transform 800ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms);
+}
+
+
+/* ============ 좁은 화면 ============ */
+
+/* 휴대폰(760px 미만) — 메인(styles.css '좁은 화면')과 같은 경계·같은 헤더 메뉴·같은 크기 감각.
+   759.98px 인 이유: 정확히 760px 에서 CSS 와 history.js(NARROW_MQ)가 서로 다른 편에 서지 않게 */
+@media (max-width: 759.98px) {
+  /* 줄이 짧아 한글이 낱자로 끊기기 쉽다 — 어절 단위로만 넘긴다 */
+  body { word-break: keep-all; overflow-wrap: break-word; }
+
+  /* ---- 헤더 → 전체 화면 메뉴 (메인과 같은 모양) ---- */
+  .hdr { --hdr-h: 84px; }   /* 2026-10-29: 76 → 84px, 로고 28 → 32px, 메뉴 단추 52 → 58px */
+  .hdr__brand img { height: 32px; }
+  .hdr__brand, .hdr__menu { position: relative; z-index: 2; }
+  /* 둥근 테두리 단추 안에 두 줄. 누르는 영역 58px, 보이는 원 54px */
+  .hdr__menu {
+    display: block; width: 58px; height: 58px; margin-right: -3px; padding: 0;
+    border: 0; background: none; cursor: pointer;
+    color: #fff; transition: color .35s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hdr__menu::before {
+    content: ""; position: absolute; inset: 2px; border-radius: 999px;
+    border: 1px solid currentColor; opacity: .32;
+    transition: opacity .35s ease, border-color .35s ease, transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .hdr__menu:active::before { transform: scale(.92); }
+  .hdr__menu span {
+    position: absolute; left: 50%; top: 50%;
+    width: 22px; height: 2px; margin-left: -11px; border-radius: 2px; background: currentColor;
+    transition: transform .5s cubic-bezier(.65,0,.35,1), width .4s cubic-bezier(.22,1,.36,1), margin .4s cubic-bezier(.22,1,.36,1);
+  }
+  .hdr__menu span:first-child { transform: translateY(-5px); }
+  .hdr__menu span + span     { width: 14px; margin-left: -3px; transform: translateY(5px); }
+  .hdr.is-past .hdr__menu { color: var(--ink); }
+  .hdr.is-past .hdr__menu::before { opacity: .18; }
+
+  /* nav 자체가 메뉴판이 된다. 열리기 전에는 visibility 로 숨겨 탭 이동에도 잡히지 않는다 */
+  .hdr__nav {
+    position: fixed; inset: 0; z-index: 1;
+    flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px;
+    padding: 0 var(--gutter); background: var(--dark); color: #fff;
+    opacity: 0; visibility: hidden;
+    transition: opacity .4s ease, visibility 0s linear .4s;
+    counter-reset: hnav;
+  }
+  .hdr__nav a {
+    display: flex; align-items: baseline; gap: 14px; padding: 8px 0;
+    font-size: clamp(30px, 9vw, 40px); font-weight: 800;
+    transform: translateY(18px); opacity: 0;
+    transition: transform .6s cubic-bezier(.22,1,.36,1), opacity .5s ease;
+    counter-increment: hnav;
+  }
+  .hdr__nav a::before {
+    content: "0" counter(hnav);
+    font-size: 13px; font-weight: 700; color: var(--mint); font-variant-numeric: tabular-nums;
+  }
+  /* 지금 페이지(회사소개)는 번호까지 민트로 — 나머지와 구분 */
+  .hdr__nav a.is-current { color: var(--mint); }
+  .hdr.is-past .hdr__nav { color: #fff; }
+
+  /* 열림 — 반투명 판·블러와 transform 을 걷는다. 남아 있으면 fixed 인 nav 가
+     화면이 아니라 헤더 띠 안에 갇힌다(.hdr 기본값이 translateY(0) 이다) */
+  .hdr.is-open { background: transparent; backdrop-filter: none; border-bottom-color: transparent; transform: none;
+                 transition: none; }   /* 블러·숨김이 서서히 풀리는 동안에도 nav 가 헤더 띠에 갇히므로 즉시 바꾼다 */
+  .hdr.is-open .hdr__brand img { filter: brightness(0) invert(1); }
+  .hdr.is-open .hdr__menu { color: #fff; }
+  .hdr.is-open .hdr__menu::before { opacity: 1; border-color: var(--mint); }
+  .hdr.is-open .hdr__menu span { width: 22px; margin-left: -11px; }
+  .hdr.is-open .hdr__menu span:first-child { transform: rotate(45deg); }
+  .hdr.is-open .hdr__menu span + span     { transform: rotate(-45deg); }
+  .hdr.is-open .hdr__nav { opacity: 1; visibility: visible; transition: opacity .4s ease; }
+  .hdr.is-open .hdr__nav a { transform: none; opacity: 1; }
+  .hdr.is-open .hdr__nav a:nth-child(1) { transition-delay: .08s; }
+  .hdr.is-open .hdr__nav a:nth-child(2) { transition-delay: .14s; }
+  .hdr.is-open .hdr__nav a:nth-child(3) { transition-delay: .2s; }
+  .hdr.is-open .hdr__nav a:nth-child(4) { transition-delay: .26s; }
+  html.menu-open, html.menu-open body { overflow: hidden; }
+
+  /* ---- 히어로 — 기둥 3개(history.js BOUNDS_NARROW). 세로선도 그 경계(33.3 / 66.7%)에만 ---- */
+  .hhero__rules span:nth-child(1), .hhero__rules span:nth-child(4) { display: none; }
+
+  /* ---- 히어로 — SINCE 는 위, 카피는 아래. 글씨는 메인 히어로와 같은 급 ---- */
+  .hhero__inner { padding: calc(var(--hdr-h) + 36px) var(--gutter) clamp(48px, 7svh, 72px); }
+  .hhero__row { height: auto; min-height: calc(100svh - 200px); flex-direction: column-reverse; justify-content: space-between; flex-wrap: nowrap; }
+  .hhero__copy { top: 0; align-self: flex-start; }
+  .hhero__since { align-items: flex-start; margin-left: 0; }
+  .hhero__since p:first-child { font-size: 14px; }
+  .hhero__since p:last-child { font-size: 18px; }
+  .hhero__eyebrow { font-size: 18px; }
+  .hhero__title { margin-top: 16px; font-size: clamp(38px, 10.8vw, 46px); line-height: 1.22; }
+  .hhero__lead { font-size: 17px; line-height: 1.75; }
+  .hhero__lead br { display: none; }
+
+  /* ---- 연표 — 한 줄. 날짜를 위에 작게, 내용은 폭 전체에 크게 ---- */
+  .htl-wrap { padding-top: clamp(112px, 16svh, 150px); }
+  .hyr { gap: 40px; padding-bottom: 120px; }
+  .hyr__year { font-size: clamp(52px, 15vw, 64px); }
+  .hyr__months { margin-top: 32px; gap: 28px; }
+  .hyr__m { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .hyr__date { font-size: 15px; color: var(--accent); }
+  .hyr__items { gap: 8px; }
+  .hyr__items p { font-size: 18px; line-height: 1.55; }
+  .hyr__tags span { font-size: 14px; }
+  body.is-dark .hyr__date { color: var(--mint); }
+
+  /* ---- 인증서 — 제목을 키운다. 카드 크기는 history.js layoutCerts 가 화면 높이에 맞춘다 ---- */
+  .hcert__label { font-size: 18px; }
+  .hcert__title { font-size: clamp(32px, 9.4vw, 40px); line-height: 1.25; }
+  .hcard__cap p:first-child { font-size: 19px; }
+  .hcard__cap p + p { font-size: 15px; }
+
+  /* ---- 푸터 — 메인 모바일과 같은 정리(로고 위, 회사·주소·연락 이름표). 이 페이지는 검정 판 ---- */
+  .hftr__inner { display: flex; flex-direction: column; gap: 20px; padding-top: 48px; padding-bottom: 40px; }
+  .hftr__brand { order: -1; }
+  .hftr__brand img { height: 28px; }
+  .hftr__col { gap: 0; }
+  .hftr__meta { flex-direction: column; gap: 0; }
+  .hftr__meta p { position: relative; padding-left: 52px; font-size: 14.5px; line-height: 1.8; color: rgba(255,255,255,.62); }
+  .hftr__meta p::before {
+    position: absolute; left: 0; top: 0;
+    font-size: 13px; font-weight: 700; color: #fff;
+  }
+  .hftr__meta:first-child p:first-child::before { content: "회사"; }
+  .hftr__meta + .hftr__meta { margin-top: 10px; }
+  .hftr__meta + .hftr__meta p:first-child::before { content: "주소"; }
+  .hftr__meta + .hftr__meta p:nth-child(2) { margin-top: 10px; }
+  .hftr__meta + .hftr__meta p:nth-child(2)::before { content: "연락"; }
+  .hftr__copy { margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.12); font-size: 12px; }
+}
+
+@media (max-width: 759.98px) and (prefers-reduced-motion: reduce) {
+  .hdr__nav, .hdr__nav a, .hdr__menu span { transition: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hdr { transition: background .3s ease; }
+  /* 부딪힘 연출 없이 구슬만 감춘다 */
+  .htl__bead.is-hit .htl__core, .htl__bead.is-hit .htl__ring { animation: none; }
+  .htl__bead.is-hit { opacity: 0; }
+}

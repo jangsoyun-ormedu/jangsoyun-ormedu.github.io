@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>연혁 — (주)오름에듀테크</title>
+<meta name="description" content="2020년부터 이어온 오름에듀테크의 교육 현장 기록 — EBS 자기주도학습센터, 교육멘토링, 디지털새싹, 인증 현황까지.">
+<script>
+  // 모션 가능한 환경에서만 등장 전 숨김 상태를 켬 — 첫 페인트 전에 적용해 깜빡임 방지.
+  if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.documentElement.classList.add("motion");
+  }
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="history.css">
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <div class="hdr__inner">
+    <a href="index.html" class="hdr__brand">
+      <img src="assets/logo.png" alt="오름에듀테크">
+    </a>
+    <!-- 좁은 화면(760px 미만)에서는 같은 nav 가 전체 화면 메뉴가 되고, 이 버튼이 연다 (메인과 같은 구조) -->
+    <nav class="hdr__nav" id="hdrNav">
+      <a href="#top" class="is-current" aria-current="page">회사소개</a>
+      <a href="education.html">교육</a>
+      <a href="system.html">시스템</a>
+      <a href="apps.html">앱</a>
+    </nav>
+    <button type="button" class="hdr__menu" id="hdrMenu" aria-controls="hdrNav" aria-expanded="false" aria-label="메뉴 열기">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ============ HERO — 다섯 기둥으로 쪼개 넘기는 사진 ============
+     기둥 경계(8.333 / 33.333 / 66.667 / 91.667%)마다 얇은 세로선이 선다.
+     기둥과 면은 history.js 가 그린다. 스크립트가 없으면 .hhero__media 의 배경(첫 장)만 보인다. -->
+<section id="top" class="hhero">
+  <div class="hhero__media" id="hheroMedia" aria-hidden="true"></div>
+  <div class="hhero__scrim" aria-hidden="true"></div>
+  <div class="hhero__rules" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+  <div class="hhero__inner">
+    <div class="hhero__row">
+      <div class="hhero__copy">
+        <p class="hhero__eyebrow" data-reveal>Our History</p>
+        <h1 class="hhero__title" data-reveal>교육 혁신을 향해<br>걸어온 길</h1>
+        <p class="hhero__lead" data-reveal>다양한 교육 프로그램과 기술을 통해 학습 경험을 새롭게 만들어왔습니다. <br>축적된 현장 노하우와 성과를 바탕으로 더 나은 교육의 길을 이어가고 있습니다.</p>
+      </div>
+      <div class="hhero__since" data-reveal>
+        <p>SINCE 2020</p>
+        <p>7년의 교육 현장 기록</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 연표 ============
+     넓은 화면(900px~)에서는 가운데 세로선을 따라 구슬 하나만 화면 중앙 높이를 따라 내려가고,
+     지나간 해만 색이 켜진다. 구슬은 아래 인증서 구획의 'Certification' 라벨까지 내려가
+     부딪히며 튕기고, 파문이 퍼지면서 라벨·제목·인증서가 켜진다.
+     해마다 글/사진이 좌우로 번갈아 선다(.hyr--flip). -->
+<section class="htl-wrap">
+  <div class="htl" id="htl">
+    <div class="htl__line" aria-hidden="true"></div>
+    <!-- 구슬: 바깥(.htl__bead)은 위치만, 안쪽 core 가 부딪힘 바운스, ring 둘이 퍼지는 파문 -->
+    <span class="htl__bead" id="htlBead" aria-hidden="true">
+      <span class="htl__ring"></span><span class="htl__ring htl__ring--2"></span>
+      <span class="htl__core"></span>
+    </span>
+
+    <article class="hyr" id="y2026" data-yr>
+      <span class="hyr__dot" data-dot aria-hidden="true"></span>
+      <div class="hyr__text">
+        <h2 class="hyr__year" data-reveal>2026</h2>
+        <div class="hyr__months">
+          <div class="hyr__m" data-reveal><span class="hyr__date">2026.06</span><div class="hyr__items"><p>EBS 자기주도학습센터 6~12월 운영</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2026.05</span><div class="hyr__items"><p>서울AI재단 서울AI에듀테크 플랫폼 운영</p><p>육군교육사령부 차세대교육시스템 운영</p><p>독거노인재단 교육플랫폼 운영</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2026.04</span><div class="hyr__items"><p>'26 디지털새싹 주관기관 선정</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2026.03</span><div class="hyr__items"><p>경기도청 1318온코칭 운영</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2026.02</span><div class="hyr__items"><p>국방부 EBS교육멘토링 운영</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2026.01</span><div class="hyr__items"><p>EBS 자기주도학습센터 1~5월 운영</p></div></div>
+        </div>
+      </div>
+      <div class="hyr__media">
+        <div class="hyr__fig hyr__fig--vintage" data-reveal><img src="assets/history/2026-1.jpg" alt="교실에서 화면 속 학습 안내를 보며 설명을 듣는 학생들" loading="lazy" decoding="async"></div>
+      </div>
+    </article>
+
+    <article class="hyr hyr--flip" id="y2025" data-yr>
+      <span class="hyr__dot" data-dot aria-hidden="true"></span>
+      <div class="hyr__text">
+        <h2 class="hyr__year" data-reveal>2025</h2>
+        <div class="hyr__months">
+          <div class="hyr__m" data-reveal><span class="hyr__date">2025.12</span><div class="hyr__items"><p>EBS 전국형 자기주도학습센터 운영</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2025.09</span><div class="hyr__items"><p>EBS 포천형 자기주도학습센터 운영</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2025.06</span><div class="hyr__items"><p>한국과학창의재단 창의인성교육넷 통합 운영</p><div><p>벤처기업 인증</p><p class="hyr__tags"><span>#혁신성장유형</span></p></div><p>원격평생교육원(원격평생교육시설) 인가</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2025.01</span><div class="hyr__items"><div><p>경기도 청소년 학습코칭 온라인 서비스</p><p class="hyr__tags"><span>#국방부</span><span>#자동차손해배상진흥원</span><span>#양주시청</span><span>#경북울릉교육지원청</span></p></div><p>EBS 콘텐츠 활용 교육멘토링 운영(1318온코칭)</p><p>무안고등학교 AI멘토링스쿨 운영</p><div><p>특허등록</p><p class="hyr__tags"><span>#AI 기반 개인 맞춤형 대학 입시 정보 진단·컨설팅 방법·장치·시스템</span></p></div></div></div>
+        </div>
+      </div>
+      <div class="hyr__media">
+        <div class="hyr__fig hyr__fig--vintage" data-reveal><img src="assets/history/2025.jpg" alt="주간 학습 플래닝 작성법을 안내하는 학습 코칭 현장" loading="lazy" decoding="async"></div>
+      </div>
+    </article>
+
+    <article class="hyr" id="y2024" data-yr>
+      <span class="hyr__dot" data-dot aria-hidden="true"></span>
+      <div class="hyr__text">
+        <h2 class="hyr__year" data-reveal>2024</h2>
+        <div class="hyr__months">
+          <div class="hyr__m" data-reveal><span class="hyr__date">2024.06</span><div class="hyr__items"><p>SK플래닛 희망리턴패키지(경영개선) 교육사업 운영</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2024.05</span><div class="hyr__items"><p>강원도특별자치도교육청 멘토링</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2024.03</span><div class="hyr__items"><p>경남교육청 멘토링 사업</p><p>경기도교육청 1318온코칭</p><p>무안고등학교 AI멘토링 스쿨</p><p>한국과학창의재단 디지털새싹</p></div></div>
+        </div>
+      </div>
+      <div class="hyr__media">
+        <div class="hyr__fig" data-reveal><img src="assets/history/2024.png" alt="2024년 사업 현장" loading="lazy" decoding="async"></div>
+      </div>
+    </article>
+
+    <article class="hyr hyr--flip" id="y2023" data-yr>
+      <span class="hyr__dot" data-dot aria-hidden="true"></span>
+      <div class="hyr__text">
+        <h2 class="hyr__year" data-reveal>2023</h2>
+        <div class="hyr__months">
+          <div class="hyr__m" data-reveal><span class="hyr__date">2023.09</span><div class="hyr__items"><p>EBS 전국형 자기주도학습센터 운영</p><p>벤처기업 인증</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2023.07</span><div class="hyr__items"><p>EBS 포천형 자기주도학습센터 운영</p><p>EBS 콘텐츠 활용 교육멘토링 운영</p><p>무안고등학교 AI멘토링스쿨 운영</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2023.03</span><div class="hyr__items"><p>EBS 콘텐츠 활용 군인자녀 온라인 교육멘토링</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2023.01</span><div class="hyr__items"><p>군인자녀대상 학습지원을 위한 EBS교육멘토링</p><p>경상남도교육청-EBS활용 사회통합 교육멘토링</p></div></div>
+        </div>
+      </div>
+      <div class="hyr__media">
+        <div class="hyr__fig" data-reveal><img src="assets/history/2023.png" alt="2023년 사업 현장" loading="lazy" decoding="async"></div>
+      </div>
+    </article>
+
+    <article class="hyr" id="y2022" data-yr>
+      <span class="hyr__dot" data-dot aria-hidden="true"></span>
+      <div class="hyr__text">
+        <h2 class="hyr__year" data-reveal>2022</h2>
+        <div class="hyr__months">
+          <div class="hyr__m" data-reveal><span class="hyr__date">2022.08</span><div class="hyr__items"><p>한국교통안전공단 EBS교육멘토링</p><p>한국교통안전공단 EBS 콘텐츠 제휴</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2022.05</span><div class="hyr__items"><p>인천광역시교육청-EBS연계 온라인 교육멘토링</p><p>계룡교육지원청-EBS찾아가는 진로체험 드림멘토링</p><p>EBS와 함께하는 진로체험 드림멘토링(논산)</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2022.04</span><div class="hyr__items"><p>강원도교육청 기초학력격차 완화 온라인 교육멘토링</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2022.03</span><div class="hyr__items"><p>경상남도교육청-EBS활용 사회통합 교육멘토링</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2022.01</span><div class="hyr__items"><p>군인자녀대상 학습지원을 위한 EBS교육멘토링</p></div></div>
+        </div>
+      </div>
+      <div class="hyr__media">
+        <div class="hyr__fig" data-reveal><img src="assets/history/2022.png" alt="2022년 사업 현장" loading="lazy" decoding="async"></div>
+      </div>
+    </article>
+
+    <article class="hyr hyr--flip" id="y2021" data-yr>
+      <span class="hyr__dot" data-dot aria-hidden="true"></span>
+      <div class="hyr__text">
+        <h2 class="hyr__year" data-reveal>2020~2021</h2>
+        <div class="hyr__months">
+          <div class="hyr__m" data-reveal><span class="hyr__date">2021.07</span><div class="hyr__items"><p>한국교통안전공단 EBS교육멘토링</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2021.06</span><div class="hyr__items"><p>EBS와 함께하는 진로체험 드림멘토링(논산)</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2021.02</span><div class="hyr__items"><p>한국청소년정책연구원 어울림 학교폭력예방 콘텐츠 개발</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2021.01</span><div class="hyr__items"><p>군인자녀대상 학습지원을 위한 EBS교육멘토링</p><p>제주시 자기주도학습센터 EBS교육멘토링-온라인꿈드림</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2020.05</span><div class="hyr__items"><p>EBS교육멘토링·EBS원격교육연수원 협약 체결</p><p>EBS원격교육연수원 홈페이지 개발·콘텐츠 제작</p><p>'통통통' 콘텐츠 제작</p><p>'교사, 통합교육을 말하다' 콘텐츠 제작</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2020.03</span><div class="hyr__items"><p>한국만화영상진흥원 K-Comics 운영 &amp; 교재개발</p></div></div>
+          <div class="hyr__m" data-reveal><span class="hyr__date">2020.01</span><div class="hyr__items"><p>강원도교육청 기초학력격차 완화 온라인 교육멘토링</p><p>경상남도교육청-EBS활용 사회통합 교육멘토링</p></div></div>
+        </div>
+      </div>
+      <div class="hyr__media">
+        <div class="hyr__fig" data-reveal><img src="assets/history/2021.png" alt="디지털 쉼표 캠프에 참여한 학생들의 단체 사진" loading="lazy" decoding="async"></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ 인증서 갤러리 ============
+     원통 위에 늘어선 카드. 가운데 카드만 커지고, 연표의 구슬이 라벨에 닿아야 색이 돈다.
+     좌우로 끌거나 옆 카드를 누르면 돈다. -->
+<!-- 마지막 연도 → 인증서 구획 사이 여백 560px 중 아래 300px(위 260px 은 마지막 연도의 아래 여백).
+     이 구간을 스크롤하는 동안 페이지 전체가 흰색에서 검정으로 바뀐다(history.js updateTone).
+     인증서 구획 자체는 한 화면 높이를 지켜야 해서 여백을 구획 밖에 따로 둔다. -->
+<div class="hcert-gap" aria-hidden="true"></div>
+
+<section class="hcert" id="certs">
+  <div class="hcert__head">
+    <p class="hcert__label" id="certLabel" data-reveal>Certification</p>
+    <!-- 제목과 캐러셀은 스크롤 리빌이 아니라 구슬이 부딪히는 순간 등장한다 (.hcert.is-open) -->
+    <h2 class="hcert__title">검증된 교육 역량,<br>신뢰받는 교육 파트너</h2>
+  </div>
+  <div class="hcert__stage" id="certStage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="인증서 — 좌우 화살표로 넘기기"></div>
+</section>
+
+<footer class="hftr">
+  <div class="hftr__inner">
+    <div class="hftr__col">
+      <div class="hftr__meta">
+        <p>(주)오름에듀테크</p>
+        <p>대표이사 박성규</p>
+        <p>사업자등록번호 686-81-01781</p>
+      </div>
+      <div class="hftr__meta">
+        <p>서울특별시 서초구 서초중앙로 40-8 베스트원빌딩 2층</p>
+        <p>TEL 1555-7998</p>
+        <p>FAX 02-6949-2205</p>
+        <p>orm@ormedu.co.kr</p>
+      </div>
+      <p class="hftr__copy">© 2026 OREUM EDUTECH Corp.</p>
+    </div>
+    <div class="hftr__brand">
+      <img src="assets/logo.png" alt="오름에듀테크" loading="lazy">
+    </div>
+  </div>
+</footer>
+
+<script src="history.js"></script>
+</body>
+</html>

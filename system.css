@@ -1,0 +1,495 @@
+/* =========================================================
+   오름에듀테크 — 시스템 페이지
+   디자인 원본: zipfiles/005.zip · untitled/project/오름에듀테크 시스템.dc.html
+
+   본문 세 구획(.sec__*)의 규격은 교육 페이지와 같다 — 원본 두 파일이 같은 뼈대를
+   쓴다. 앱 페이지까지 나오면 공통 부분을 한 파일로 빼는 게 낫다.
+   자간은 인라인 값이 그대로 렌더값이다(원본에 자간 주입 스크립트가 없다).
+   ========================================================= */
+
+:root {
+  --ink:    #15171a;
+  --teal:   #00908c;
+  --gray:   #8b8e95;
+  --body:   #6b6e75;
+  --line:   #ececea;
+  --hdr-h:  68px;
+  /* 페이지 규격 — 헤더와 본문 구획이 같은 값을 쓴다. 한쪽만 바꾸면 정렬이 어긋난다 */
+  --pagew:  1400px;
+  --gutter: clamp(20px, 4vw, 56px);
+}
+/* 2026-10-30: PC 상단 GNB 20% 키움 — 높이 68 → 82px, 로고 24 → 29px, 메뉴 글자 15 → 18px, 간격 22 → 26px.
+   휴대폰(759.98px 이하)은 따로 정한 값(84px 헤더·전체 화면 메뉴)을 그대로 쓴다 */
+@media (min-width: 760px) { :root { --hdr-h: 82px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+html { scroll-behavior: smooth; }
+a { color: var(--ink); text-decoration: none; }
+a:hover { color: var(--teal); }
+::selection { background: #c9f2f0; }
+img { border-style: none; }
+
+
+/* ============ 헤더 ============
+   네 페이지 공통이다. 히어로 위에서는 완전 투명 — 원본은 여기에 위쪽이 어두운
+   그라데이션을 깔지만, 그러면 맨 위에서 띠의 아래 경계가 선처럼 보인다. 흰 로고·메뉴의
+   가독성은 히어로 자체의 스크림(.shero__scrim)이 이미 왼쪽 위를 눌러 주고 있어 충분하다. */
+
+.hdr {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 80;
+  box-shadow: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  transform: translateY(0);
+  transition: transform .3s ease, background .3s ease, border-color .3s ease, backdrop-filter .3s ease;
+}
+/* 본문 구획(.sec)과 같은 규격 — 로고 왼쪽 끝이 사진·본문 왼쪽 끝과 맞는다 */
+.hdr__inner {
+  max-width: var(--pagew); margin: 0 auto; padding: 0 var(--gutter);
+  height: var(--hdr-h);
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.hdr__brand { display: flex; align-items: center; flex-shrink: 0; }
+.hdr__brand img { height: 29px; width: auto; display: block; filter: brightness(0) invert(1); transition: filter .3s ease; }
+.hdr__nav {
+  display: flex; align-items: center; gap: 26px;
+  color: #fff; transition: color .3s ease;
+}
+.hdr__nav a {
+  color: inherit; font-size: 18px; font-weight: 600;
+  opacity: .72; transition: opacity .2s ease;
+}
+.hdr__nav a:hover { opacity: 1; color: inherit; }
+.hdr__nav a.is-current { font-weight: 700; opacity: 1; }
+
+/* 히어로를 지난 뒤 — 네 페이지 공통값: 불투명도 80% + 블러 20px + 하단선
+   (원본은 불투명 흰색 · 블러 없음 · 테두리 없음) */
+.hdr.is-past { background: rgba(255,255,255,.8); backdrop-filter: blur(20px); border-bottom-color: var(--line); }
+.hdr.is-past .hdr__brand img { filter: none; }
+.hdr.is-past .hdr__nav { color: var(--ink); }
+.hdr.is-hidden { transform: translateY(-100%); }
+
+/* 메뉴 버튼 — 넓은 화면에서는 쓰지 않는다. 좁은 화면 규칙은 아래 '휴대폰' 블록에 */
+.hdr__menu { display: none; }
+
+
+/* ============ HERO — 고정 배경 패럴랙스 ============ */
+
+/* clip-path 가 이 상자를 고정 자식의 기준 블록으로 만든다. 그래서 안쪽 레이어가
+   뷰포트가 아니라 이 상자에 맞춰 잘리고, 스크롤하면 사진이 제자리에 머무는 것처럼
+   보인다. overflow:hidden 만으로는 position:fixed 자식을 자르지 못한다. */
+.shero {
+  position: relative;
+  height: calc(80vh + 72px); min-height: 600px;
+  overflow: hidden; background: #0d1a1a;
+  clip-path: inset(0);
+}
+/* 상자보다 위아래로 넉넉히 크게 — 사진이 흐를 여유를 이 안에서 만든다 */
+.shero__layer {
+  position: fixed; left: 0; width: 100%;
+  top: calc(-10vh - 90px);
+  height: max(calc(120vh + 90px), calc(10vh + 810px));
+  pointer-events: none;
+}
+/* 실제로 움직이는 건 이 안쪽 — system.js 가 translate3d 로 밀어 준다 */
+/* --hero-drop: 사진 전체를 내리는 양. 도서관 사진은 공통 100px 에서 150px 올린 -50px (2026-10-30). system.js 패럴랙스 상한이 이 값을 따라간다 */
+.shero__img { position: relative; width: 100%; height: 100%; will-change: transform; --hero-drop: -50px; }
+.shero__img > img { width: 100%; height: 100%; object-fit: cover; display: block; transform: translateY(var(--hero-drop)); }
+
+/* 왼쪽 위에서 오른쪽 아래로 걷히는 어둠 — 카피가 앉는 쪽만 눌러 둔다 */
+.shero__scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  /* 2026-10-30: 사진이 밝아 가장자리만 살짝 어둡게 — 가운데는 그대로 두고 테두리로 갈수록 눌러 준다(비네트) */
+  background:
+    radial-gradient(ellipse 75% 70% at 50% 50%, rgba(8,14,14,0) 55%, rgba(8,14,14,.42) 100%),
+    linear-gradient(200deg, rgba(8,14,14,.62) 0%, rgba(8,14,14,.18) 38%, rgba(8,14,14,0) 60%);
+}
+
+/* 리드문은 위(오른쪽 정렬), 대형 타이틀은 아래 */
+.shero__content {
+  position: relative; z-index: 2; height: 100%;
+  display: flex; flex-direction: column; justify-content: space-between;
+  /* 좌우는 --gutter — 히어로 카피가 헤더 로고·아래 본문과 같은 선에 선다.
+     위아래는 리드문과 타이틀을 위아래로 벌리는 이 히어로의 구성값이다. */
+  padding: clamp(28px, 5vw, 80px) var(--gutter);
+  color: #fff;
+}
+.shero__lead {
+  margin: 0; padding-top: 48px; align-self: flex-end;
+  max-width: min(100%, 640px); text-align: right;
+  font-size: clamp(18px, 2vw, 28px); line-height: 1.45; letter-spacing: -.03em; font-weight: 600;
+  text-shadow: 0 1px 18px rgba(0,0,0,.45); text-wrap: pretty;
+}
+.shero__title {
+  margin: 0;
+  font-size: clamp(44px, 7vw, 120px); line-height: .95; letter-spacing: -.04em; font-weight: 700;
+  text-transform: uppercase; color: #fff;
+  mix-blend-mode: difference;
+}
+
+
+/* ============ 본문 세 구획 (01 LMS / 02 셀공 / 03 AI 코스웨어) ============ */
+
+.sec {
+  max-width: var(--pagew); margin: 0 auto;
+  padding: clamp(200px, 23.6vw, 340px) var(--gutter) 0;
+}
+/* 히어로 바로 뒤 */
+.sec--first { padding-top: clamp(140px, 14vw, 220px); }
+
+.sec__head {
+  border-bottom: 1px solid var(--gray);
+  padding: 0 clamp(0px, 6vw, 110px) clamp(56px, 6vw, 90px);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: 28px clamp(32px, 5vw, 80px); align-items: start;
+}
+/* 넓은 화면에서는 리드 칸을 540px 로 고정한다 — 반반 나누면 최대 510px 라 리드문이 너무 일찍 꺾였다.
+   칸만 넓히면 리드 시작 위치가 반반일 때보다 30px 왼쪽으로 당겨지므로, 왼쪽 패딩 30px 로
+   예전 자리에 되돌린다 */
+@media (min-width: 1100px) {
+  .sec__head { grid-template-columns: minmax(0, 1fr) 540px; }
+  .sec__head .sec__lead { padding-left: 30px; }
+}
+.sec__headline { display: flex; align-items: flex-start; gap: clamp(14px, 1.4vw, 20px); min-width: 0; }
+.sec__no {
+  flex-shrink: 0;
+  font-size: clamp(46px, 4.6vw, 66px); font-weight: 600; letter-spacing: -.03em; line-height: .9;
+}
+.sec__title {
+  margin: 0;
+  font-size: clamp(22px, 2vw, 28px); line-height: 1.45; letter-spacing: -.035em; font-weight: 700;
+}
+.sec__lead {
+  margin: 0; max-width: 560px;
+  font-size: clamp(16px, 1.35vw, 19px); line-height: 1.7; letter-spacing: -.03em; font-weight: 700;
+  text-wrap: pretty;
+}
+
+/* 사진 + 글 한 줄 — 반반 두 칸. 원본은 648px 사진 + flex 였지만 본문 폭(1288)이 648×2 보다 좁아
+   두 줄의 사진이 화면 가운데에서 겹쳤다. 반반으로 나눠 사진이 가운데 기준 좌우 대칭이 되게 한다 */
+.sec__row {
+  margin: clamp(44px, 5vw, 72px) 0 0;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center; gap: clamp(32px, 4vw, 64px) 0;
+}
+.sec__row--lead { margin-top: clamp(80px, 9vw, 140px); }
+/* 좁으면 한 칸으로 접는다 — 사진이 오른쪽인 줄은 order 로 글 아래에 온다 */
+@media (max-width: 900px) { .sec__row { grid-template-columns: minmax(0, 1fr); } }
+
+.sec__fig {
+  position: relative;
+  width: 100%; min-width: 0;
+  aspect-ratio: 19/10; overflow: hidden; background: #f1f1ef;
+  /* 밝은 사진이 흰 바탕에 묻히지 않게 두르는 얇은 선 (009) */
+  outline: .5px solid rgba(21,23,26,.1); outline-offset: 0;
+}
+.sec__fig > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* 사진을 오른쪽으로 — 줄마다 좌우가 번갈아 놓인다 */
+.sec__fig--right { order: 2; }
+
+/* 글 칸 좌우 여백 — 원본은 clamp(0,4vw,72px) 지만 사진 옆 글 폭이 460px 대까지 줄어 문단의 강제 줄바꿈과 어긋났다 */
+.sec__txt { min-width: 0; padding: 0 clamp(0px, 1.5vw, 24px); }
+/* 칸 사이 간격을 0 으로 두어 사진이 가운데 선까지 차게 하고(1440 에서 644px), 사진–글 간격은 글 칸의 사진 쪽 여백으로 준다 */
+@media (min-width: 901px) {
+  .sec__fig + .sec__txt { padding-left: calc(clamp(32px, 4vw, 64px) + clamp(0px, 1.5vw, 24px)); }
+  .sec__fig--right + .sec__txt { padding-left: clamp(0px, 1.5vw, 24px); padding-right: calc(clamp(32px, 4vw, 64px) + clamp(0px, 1.5vw, 24px)); }
+}
+/* 문단 줄바꿈 — 강제 <br> 없이 칸 폭에 맞춰 흐른다. 한글은 단어(어절) 중간에서 끊지 않고(keep-all),
+   리드문은 줄 길이를 고르게(balance), 본문은 마지막 줄에 한 단어만 남지 않게(pretty) 한다 */
+.sec__lead, .sec__body { word-break: keep-all; overflow-wrap: break-word; }
+.sec__lead { text-wrap: balance; }
+.sec__body { margin: 0; font-size: 15px; line-height: 1.85; color: var(--body); text-wrap: pretty; }
+.sec__body + .sec__body { margin-top: 16px; }
+
+/* ---- 소제목 · STEP 흐름 · 항목 표 (012 에서 04 에 처음 생겼고, 013 에서 01~03 에도 붙었다).
+        값은 원본 인라인 그대로, 교육 페이지의 .edu__h3 / .edu__table 과 같은 톤 ---- */
+.sec__h3 {
+  margin: 0;
+  font-size: clamp(21px, 2vw, 26px); line-height: 1.4; letter-spacing: -.035em; font-weight: 700;
+}
+.sec__body--after { margin-top: 28px; }
+.sec__body--h3 { margin-top: 20px; }   /* 표 없이 소제목 바로 아래 오는 본문 (03 성장 기록) */
+
+/* STEP 1~3 — 머리선 아래 세 칸, 칸 사이는 얇은 세로선 */
+.sec__flow {
+  margin: 24px 0 0; padding: 0; list-style: none;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--ink);
+}
+.sec__flow li { min-width: 0; padding: 14px 10px 0 12px; border-left: 1px solid var(--line); }
+.sec__flow li:first-child { padding-left: 0; border-left: 0; }
+.sec__flow li:last-child { padding-right: 0; }
+.sec__flow span { display: block; word-break: keep-all; }
+.sec__flowno { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: #1aaeb0; }
+.sec__flowname { margin-top: 6px; font-size: 15px; font-weight: 700; letter-spacing: -.03em; line-height: 1.4; }
+.sec__flowsub { margin-top: 4px; font-size: 13px; line-height: 1.5; color: var(--gray); }
+/* 02 셀공 — STEP 네 칸, 본문 아래에 온다 */
+.sec__flow--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sec__flow--after { margin-top: 28px; }
+@media (max-width: 480px) {
+  /* 좁은 폰에서 네 칸은 글자가 끼므로 2×2 로 접는다 — 3번째 칸이 새 줄 첫 칸이 된다 */
+  .sec__flow--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+  .sec__flow--4 li:nth-child(3) { padding-left: 0; border-left: 0; }
+  .sec__flow--4 li:nth-child(2) { padding-right: 0; }
+}
+
+/* 항목 표 — 머리선만 진하고 줄마다 얇은 선 */
+.sec__table { margin: 24px 0 0; border-top: 1px solid var(--ink); }
+.sec__trow {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 4px 20px; padding: 14px 0; border-bottom: 1px solid var(--line);
+}
+.sec__tk { font-size: 15.5px; font-weight: 700; }
+.sec__tv { font-size: 14.5px; color: var(--gray); }
+
+/* 마지막 구획과 푸터 사이 */
+.sec__tail { height: clamp(130px, 14vw, 200px); }
+
+
+/* ============ 푸터 — 메인(styles.css .ftr)과 같은 구성 ============ */
+
+.sftr { background: #fff; border-top: 1px solid var(--line); }
+.sftr__inner {
+  max-width: var(--pagew); margin: 0 auto;
+  padding: clamp(44px, 5vw, 68px) var(--gutter) clamp(36px, 4vw, 56px);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(28px, 4vw, 64px);
+}
+.sftr__col { min-width: 0; display: flex; flex-direction: column; gap: clamp(20px, 2.4vw, 30px); }
+.sftr__meta { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.sftr__meta p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--gray); }
+.sftr__copy { margin: 0; font-size: 12.5px; color: #a8abb1; }
+.sftr__brand { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-self: end; }
+.sftr__brand img { height: 26px; width: auto; display: block; }
+
+
+/* ============ 등장 리빌 ============ */
+
+html.motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 800ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms),
+              transform 800ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms);
+}
+html.motion [data-reveal].is-in { opacity: 1; transform: none; }
+
+
+/* ============ 좁은 화면 ============
+   원본에는 미디어쿼리가 없다. 사진과 글은 flex-wrap 이 접어 주므로 그대로 두고,
+   원본 값으로 실제로 깨지는 곳만 잡는다. */
+
+/* 휴대폰(760px 미만) — 메인·회사소개·교육과 같은 경계·같은 헤더 메뉴·같은 크기와 간격.
+   본문 구획(.sec__*)의 값은 교육 페이지(.edu__*) 휴대폰 블록과 같다.
+   759.98px 인 이유: 정확히 760px 에서 CSS 와 system.js(narrowMq)가 서로 다른 편에 서지 않게 */
+@media (max-width: 759.98px) {
+  body { word-break: keep-all; overflow-wrap: break-word; }
+
+  /* ---- 헤더 → 전체 화면 메뉴 (메인과 같은 모양) ---- */
+  .hdr { --hdr-h: 84px; }   /* 2026-10-29: 76 → 84px, 로고 28 → 32px, 메뉴 단추 52 → 58px */
+  .hdr__brand img { height: 32px; }
+  .hdr__brand, .hdr__menu { position: relative; z-index: 2; }
+  /* 둥근 테두리 단추 안에 두 줄. 누르는 영역 58px, 보이는 원 54px */
+  .hdr__menu {
+    display: block; width: 58px; height: 58px; margin-right: -3px; padding: 0;
+    border: 0; background: none; cursor: pointer;
+    color: #fff; transition: color .3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hdr__menu::before {
+    content: ""; position: absolute; inset: 2px; border-radius: 999px;
+    border: 1px solid currentColor; opacity: .32;
+    transition: opacity .35s ease, border-color .35s ease, transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .hdr__menu:active::before { transform: scale(.92); }
+  .hdr__menu span {
+    position: absolute; left: 50%; top: 50%;
+    width: 22px; height: 2px; margin-left: -11px; border-radius: 2px; background: currentColor;
+    transition: transform .5s cubic-bezier(.65,0,.35,1), width .4s cubic-bezier(.22,1,.36,1), margin .4s cubic-bezier(.22,1,.36,1);
+  }
+  .hdr__menu span:first-child { transform: translateY(-5px); }
+  .hdr__menu span + span     { width: 14px; margin-left: -3px; transform: translateY(5px); }
+  .hdr.is-past .hdr__menu { color: var(--ink); }
+  .hdr.is-past .hdr__menu::before { opacity: .18; }
+
+  /* nav 자체가 메뉴판이 된다. 열리기 전에는 visibility 로 숨겨 탭 이동에도 잡히지 않는다 */
+  .hdr__nav {
+    position: fixed; inset: 0; z-index: 1;
+    flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px;
+    padding: 0 var(--gutter); background: #0d0f11; color: #fff;
+    opacity: 0; visibility: hidden;
+    transition: opacity .4s ease, visibility 0s linear .4s;
+    counter-reset: hnav;
+  }
+  .hdr__nav a {
+    display: flex; align-items: baseline; gap: 14px; padding: 8px 0;
+    font-size: clamp(30px, 9vw, 40px); font-weight: 800;
+    transform: translateY(18px); opacity: 0;
+    transition: transform .6s cubic-bezier(.22,1,.36,1), opacity .5s ease;
+    counter-increment: hnav;
+  }
+  .hdr__nav a::before {
+    content: "0" counter(hnav);
+    font-size: 13px; font-weight: 700; color: #4fded8; font-variant-numeric: tabular-nums;
+  }
+  .hdr__nav a.is-current { color: #4fded8; }
+  .hdr.is-past .hdr__nav { color: #fff; }
+
+  /* 열림 — 반투명 판·블러와 transform 을 걷는다. 남아 있으면 fixed 인 nav 가
+     화면이 아니라 헤더 띠 안에 갇힌다(.hdr 기본값이 translateY(0) 이다) */
+  .hdr.is-open { background: transparent; backdrop-filter: none; border-bottom-color: transparent; transform: none;
+                 transition: none; }   /* 블러·숨김이 서서히 풀리는 동안에도 nav 가 헤더 띠에 갇히므로 즉시 바꾼다 */
+  .hdr.is-open .hdr__brand img { filter: brightness(0) invert(1); }
+  .hdr.is-open .hdr__menu { color: #fff; }
+  .hdr.is-open .hdr__menu::before { opacity: 1; border-color: #4fded8; }
+  .hdr.is-open .hdr__menu span { width: 22px; margin-left: -11px; }
+  .hdr.is-open .hdr__menu span:first-child { transform: rotate(45deg); }
+  .hdr.is-open .hdr__menu span + span     { transform: rotate(-45deg); }
+  .hdr.is-open .hdr__nav { opacity: 1; visibility: visible; transition: opacity .4s ease; }
+  .hdr.is-open .hdr__nav a { transform: none; opacity: 1; }
+  .hdr.is-open .hdr__nav a:nth-child(1) { transition-delay: .08s; }
+  .hdr.is-open .hdr__nav a:nth-child(2) { transition-delay: .14s; }
+  .hdr.is-open .hdr__nav a:nth-child(3) { transition-delay: .2s; }
+  .hdr.is-open .hdr__nav a:nth-child(4) { transition-delay: .26s; }
+  html.menu-open, html.menu-open body { overflow: hidden; }
+
+  /* ---- 히어로 — 한 화면. 리드문은 위(왼쪽 정렬), 대형 타이틀은 아래 ---- */
+  /* 아래 두 모서리만 24px 둥글게 (2026-10-29 요청, 8px → 24px). 사진 레이어는 position:fixed 라
+     border-radius·overflow 로는 잘리지 않는다 — 잘라 주는 clip-path 에 둥근 모서리를 넣는다
+     (inset 의 round 순서: 왼쪽 위 · 오른쪽 위 · 오른쪽 아래 · 왼쪽 아래) */
+  .shero { height: 100svh; min-height: 560px; clip-path: inset(0 round 0 0 24px 24px); }
+  .shero__content { padding: calc(var(--hdr-h) + 28px) var(--gutter) clamp(48px, 7svh, 72px); }
+  /* 오른쪽 정렬 + 640px 상한이면 좁은 화면에서 타이틀과 어긋나 읽힌다 */
+  .shero__lead { align-self: flex-start; text-align: left; padding-top: 0; font-size: 21px; line-height: 1.5; }
+  .shero__lead br { display: none; }
+  .shero__title { font-size: clamp(56px, 16vw, 72px); }
+  /* 사진을 5% 작게 (2026-10-29 요청). 세로 화면에서는 사진이 높이 기준으로 채워지므로(cover)
+     채울 높이를 95% 로 줄이면 사진이 5% 작아지고 폭은 그대로 화면을 꽉 채운다.
+     (scale 로 줄이면 상자째 줄어 좌우에 빈 띠가 생겼다)
+     레이어는 상자보다 위아래로 크게 잡혀 있어 95% 로 줄여도 아래 끝이 상자 바닥보다 아래에 남는다 */
+  .shero__img { height: 95%; }
+
+  /* ---- 구획 머리 — 번호·제목·리드문을 크게. 간격은 교육 페이지와 같다 ---- */
+  .sec { padding-top: 200px; }
+  .sec--first { padding-top: 128px; }
+  .sec__head { padding: 0 0 64px; gap: 32px; }
+  .sec__headline { gap: 18px; }
+  .sec__no { font-size: 60px; }
+  .sec__title { font-size: 30px; line-height: 1.3; }
+  .sec__lead { font-size: 19px; line-height: 1.65; }
+  .sec__lead br { display: none; }
+
+  /* ---- 사진 — 화면 끝까지(좌우 거터를 넘겨) 크게, 화면 캡처 원래 비율 그대로 ----
+     19:10 칸에 맞춰 자르면 화면 캡처의 메뉴·표가 잘린다. 세로로 긴 캡처만 높이를 막고,
+     넘치는 부분은 디자인이 정해 둔 object-position(인라인) 기준으로 자른다 */
+  .sec__row { margin-top: 96px; gap: 44px 0; }
+  .sec__row--lead { margin-top: 72px; }
+  .sec__fig { width: auto; margin: 0 calc(-1 * var(--gutter)); aspect-ratio: auto; }
+  .sec__fig > img { height: auto; max-height: 125vw; }
+
+  /* ---- 글 ---- */
+  .sec__txt { padding: 0; }
+  .sec__body { font-size: 17px; line-height: 1.85; }
+  .sec__body + .sec__body { margin-top: 26px; }
+  .sec__body--h3 { margin-top: 28px; }
+  .sec__body--after { margin-top: 40px; }
+  .sec__h3 { font-size: 25px; }
+  .sec__table { margin-top: 32px; }
+  .sec__trow { padding: 20px 0; }
+  .sec__tk { font-size: 17px; }
+  .sec__tv { font-size: 15px; }
+
+  /* STEP 칸 — 세 칸은 그대로, 네 칸(02 셀공)은 2×2. 글씨를 키운다 */
+  .sec__flow { margin-top: 32px; row-gap: 30px; }
+  .sec__flow li { padding-top: 18px; }
+  .sec__flow--after { margin-top: 40px; }
+  .sec__flow--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sec__flow--4 li:nth-child(3) { padding-left: 0; border-left: 0; }
+  .sec__flow--4 li:nth-child(2) { padding-right: 0; }
+  .sec__flowno { font-size: 13px; }
+  .sec__flowname { margin-top: 8px; font-size: 18px; }
+  .sec__flowsub { margin-top: 6px; font-size: 14.5px; }
+
+  .sec__tail { height: 180px; }
+
+  /* ---- 푸터 — 메인 모바일과 같은 정리(로고 위, 회사·주소·연락 이름표) ---- */
+  .sftr__inner { display: flex; flex-direction: column; gap: 20px; padding-top: 48px; padding-bottom: 40px; }
+  .sftr__brand { order: -1; }
+  .sftr__brand img { height: 28px; }
+  .sftr__col { gap: 0; }
+  .sftr__meta { flex-direction: column; gap: 0; }
+  .sftr__meta p { position: relative; padding-left: 52px; font-size: 14.5px; line-height: 1.8; color: #55585f; }
+  .sftr__meta p::before {
+    position: absolute; left: 0; top: 0;
+    font-size: 13px; font-weight: 700; color: var(--ink);
+  }
+  .sftr__meta:first-child p:first-child::before { content: "회사"; }
+  .sftr__meta + .sftr__meta { margin-top: 10px; }
+  .sftr__meta + .sftr__meta p:first-child::before { content: "주소"; }
+  .sftr__meta + .sftr__meta p:nth-child(2) { margin-top: 10px; }
+  .sftr__meta + .sftr__meta p:nth-child(2)::before { content: "연락"; }
+  .sftr__copy { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; }
+}
+
+@media (max-width: 759.98px) and (prefers-reduced-motion: reduce) {
+  .hdr__nav, .hdr__nav a, .hdr__menu span { transition: none; }
+}
+
+
+/* ============ 섹션 바로가기 (011) ============
+   왼쪽에 붙는 번호 알약. 지금 읽는 섹션은 검정('A 블랙'), 마우스를 올리면 이름이 펼쳐진다.
+   보이기·현재 섹션 판정은 system.js sideNav — 1100px 이상에서 첫 섹션~마지막 섹션 사이에만 뜬다. */
+.snav {
+  position: fixed; left: clamp(14px, 1.6vw, 28px); top: 50%; z-index: 70;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  /* 나타날 때 왼쪽에서 살짝 밀려 들어온다 */
+  transform: translate(-10px, -50%);
+  transition: opacity .5s ease, transform .7s cubic-bezier(.22,1,.36,1), visibility 0s linear .5s;
+}
+.snav.is-shown {
+  opacity: 1; visibility: visible; pointer-events: auto; transform: translate(0, -50%);
+  transition: opacity .5s ease, transform .7s cubic-bezier(.22,1,.36,1);
+}
+.snav a {
+  display: flex; align-items: center; height: 34px; min-width: 34px; box-sizing: border-box;
+  padding: 0 11px; border-radius: 999px; border: 1px solid #dcdcd8;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+  color: #55585f; text-decoration: none; white-space: nowrap;
+  transition: background .5s ease, color .5s ease, border-color .5s ease;
+}
+.snav a.is-on { background: #15171a; color: #fff; border-color: #15171a; }
+.snav__no { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+/* 접힐 때 — 글자가 먼저 빠르게 사라지고 폭이 뒤따라 줄어든다 */
+.snav__label {
+  display: block; max-width: 0; overflow: hidden; opacity: 0; transform: translateX(-6px);
+  font-size: 13px; font-weight: 600; letter-spacing: -.02em;
+  transition: max-width .65s cubic-bezier(.22,1,.36,1), margin .65s cubic-bezier(.22,1,.36,1),
+              opacity .22s ease, transform .3s ease;
+}
+/* 펼칠 때 — 폭이 먼저 열리고 글자는 조금 늦게 스며든다.
+   현재 섹션은 늘 펼치고, 마우스를 올리거나 키보드로 들어오면 전부 펼친다.
+   버튼을 눌러 이동하면 .is-collapsed 로 바로 접고, 마우스가 묶음을 떠나면 풀어 준다. */
+.snav a.is-on .snav__label,
+.snav:not(.is-collapsed):hover .snav__label,
+.snav:has(a:focus-visible) .snav__label {
+  max-width: 220px; opacity: 1; margin-left: 8px; transform: none;
+  transition: max-width .65s cubic-bezier(.22,1,.36,1), margin .65s cubic-bezier(.22,1,.36,1),
+              opacity .45s ease .12s, transform .55s cubic-bezier(.22,1,.36,1) .08s;
+}
+.snav a:focus-visible { outline: 2px solid #15171a; outline-offset: 2px; }
+
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  /* 리빌은 html.motion 이 안 붙어 이미 꺼진다. 패럴랙스는 system.js 가 끈다. */
+  .hdr { transition: background .3s ease; }
+}

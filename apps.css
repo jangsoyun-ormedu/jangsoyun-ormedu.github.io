@@ -1,0 +1,686 @@
+/* =========================================================
+   오름에듀테크 — 앱 페이지
+   디자인 원본: zipfiles/005.zip · untitled/project/오름에듀테크 앱.dc.html
+               (01 문구·간격, 02 쌤핏, 03 대학어디가는 007·008.zip 기준)
+
+   파일 이름이 apps.* 인 이유: 같은 폴더의 app.js 가 회사소개(index.html)의
+   스크롤 체계 스크립트라 app.* 로 두면 덮어쓴다.
+   자간은 인라인 값이 그대로 렌더값이다(원본에 자간 주입 스크립트가 없다).
+   ========================================================= */
+
+:root {
+  --ink:    #15171a;
+  --teal:   #00908c;
+  --mint:   #4fded8;
+  --gray:   #8b8e95;
+  --muted:  #55585f;
+  --line:   #ececea;
+  --hdr-h:  68px;
+  --hero:   #006d6a;
+  /* 페이지 규격 — 헤더·히어로·본문·푸터가 모두 같은 값을 쓴다 */
+  --pagew:  1400px;
+  --gutter: clamp(20px, 4vw, 56px);
+}
+/* 2026-10-30: PC 상단 GNB 20% 키움 — 높이 68 → 82px, 로고 24 → 29px, 메뉴 글자 15 → 18px, 간격 22 → 26px.
+   휴대폰(759.98px 이하)은 따로 정한 값(84px 헤더·전체 화면 메뉴)을 그대로 쓴다 */
+@media (min-width: 760px) { :root { --hdr-h: 82px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+html { scroll-behavior: smooth; }
+a { color: var(--ink); text-decoration: none; }
+a:hover { color: var(--teal); }
+::selection { background: #c9f2f0; }
+img { border-style: none; }
+
+
+/* ============ 헤더 ============
+   히어로를 지나면 흰 배경 94% + 하단선. 이 페이지는 블러를 쓰지 않는다.
+   로고 filter 와 네비 색은 원본대로 트랜지션 없이 즉시 바뀐다. */
+
+.hdr {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 80;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transform: translateY(0);
+  transition: transform .3s ease, background .3s ease, border-color .3s ease, backdrop-filter .3s ease;
+}
+/* 히어로·본문·푸터와 같은 규격 */
+.hdr__inner {
+  max-width: var(--pagew); margin: 0 auto; padding: 0 var(--gutter);
+  height: var(--hdr-h);
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.hdr__brand { display: flex; align-items: center; flex-shrink: 0; }
+.hdr__brand img { height: 29px; width: auto; display: block; filter: brightness(0) invert(1); }
+.hdr__nav { display: flex; align-items: center; gap: 26px; color: #fff; }
+.hdr__nav a { color: inherit; font-size: 18px; font-weight: 600; opacity: .72; transition: opacity .2s ease; }
+.hdr__nav a:hover { opacity: 1; color: inherit; }
+.hdr__nav a.is-current { font-weight: 700; opacity: 1; }
+
+/* 네 페이지 공통값 — 불투명도 80% + 블러 20px */
+.hdr.is-past { background: rgba(255,255,255,.8); backdrop-filter: blur(20px); border-bottom-color: var(--line); }
+.hdr.is-past .hdr__brand img { filter: none; }
+.hdr.is-past .hdr__nav { color: var(--ink); }
+.hdr.is-hidden { transform: translateY(-100%); }
+
+/* 메뉴 버튼 — 넓은 화면에서는 쓰지 않는다. 좁은 화면 규칙은 아래 '휴대폰' 블록에 */
+.hdr__menu { display: none; }
+
+
+/* ============ HERO — 청록 배경 + 자기장 버블 ============ */
+
+.ahero { position: relative; overflow: hidden; background-color: var(--hero); color: #fff; }
+
+/* 장식층 전체는 마우스를 통과시킨다 — 버블만 아래에서 auto 로 되살린다 */
+.ahero__deco { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+.ahero__sparks { position: absolute; inset: 0; }
+
+/* 56px 격자. 가운데만 보이도록 타원으로 마스킹 */
+.ahero__grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 45%, #000 20%, transparent 75%);
+          mask-image: radial-gradient(ellipse 70% 80% at 50% 45%, #000 20%, transparent 75%);
+}
+
+.ahero__glow { position: absolute; border-radius: 50%; }
+.ahero__glow--mint {
+  width: 620px; height: 620px; left: -160px; top: -220px; opacity: .5;
+  background: radial-gradient(circle, rgba(79,222,216,.55), rgba(79,222,216,0) 65%);
+}
+.ahero__glow--deep {
+  width: 720px; height: 720px; right: -240px; bottom: -360px;
+  background: radial-gradient(circle, rgba(0,60,70,.55), rgba(0,60,70,0) 65%);
+}
+
+/* 점묘 ORM 마크. 여기서는 흰 점 그대로 쓴다(회사소개 쪽은 검게 눌러 쓴다) */
+.ahero__dots {
+  position: absolute; right: -4%; top: 50%; transform: translateY(-50%);
+  height: 88%; width: auto; max-width: none; opacity: .18;
+}
+
+.ahero__ring {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  aspect-ratio: 1; border-radius: 50%;
+}
+.ahero__ring--outer { width: min(900px, 120vw); border: 1px solid rgba(255,255,255,.12); }
+.ahero__ring--inner { width: min(620px, 90vw); border: 1px dashed rgba(255,255,255,.14); }
+
+/* 버블 — transform/배경/테두리/글로우는 apps.js 가 커서 거리에 맞춰 넣는다 */
+.ahero__bub {
+  position: absolute; pointer-events: auto; cursor: default;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: rgba(255,255,255,.85);
+  transition: transform .5s cubic-bezier(.16,1,.3,1), background .3s, border-color .3s, box-shadow .3s;
+}
+.ahero__bub--1 {
+  left: 9%; top: 24%; width: 68px; height: 68px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 18px;
+}
+.ahero__bub--2 {
+  left: 5%; top: 66%; width: 84px; height: 84px;
+  background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16);
+  font-size: 17px; font-weight: 800; letter-spacing: .04em;
+}
+.ahero__bub--3 {
+  right: 10%; top: 20%; width: 58px; height: 58px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 15px;
+}
+.ahero__bub--4 {
+  right: 7%; top: 62%; width: 76px; height: 76px;
+  background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16);
+  font-family: ui-monospace, Menlo, monospace; font-size: 14px;
+}
+
+/* 고정 위치 불빛 넷. 깜빡임은 apps.js 가 Web Animations 로 건다 */
+.ahero__star { position: absolute; border-radius: 50%; }
+.ahero__star--1 { left: 22%; top: 14%; width: 6px; height: 6px; background: var(--mint); box-shadow: 0 0 14px var(--mint); }
+.ahero__star--2 { left: 78%; top: 40%; width: 5px; height: 5px; background: #fff; box-shadow: 0 0 12px #fff; }
+.ahero__star--3 { left: 30%; top: 82%; width: 5px; height: 5px; background: var(--mint); box-shadow: 0 0 12px var(--mint); }
+.ahero__star--4 { left: 64%; top: 86%; width: 4px; height: 4px; background: #fff; box-shadow: 0 0 10px #fff; }
+
+/* 카피층도 마우스를 통과시킨다 — 그래야 아래 버블이 커서를 받는다 */
+.ahero__content {
+  position: relative; z-index: 2; pointer-events: none;
+  max-width: var(--pagew); margin: 0 auto;
+  /* 헤더 아래 공간에서 카피가 정확히 가운데 서도록 위(헤더 높이 제외)·아래 여백을 같은 값으로 둔다.
+     예전엔 위 18vh / 아래 11vh 라 카피가 아래로 치우쳐 보였다 — 아래를 키운 만큼 위를 줄여 전체 높이는 그대로 */
+  --hero-pad: clamp(120px, 14vh, 165px);
+  /* 실측 보정 20px — 헤더 실제 높이(69px)와 리드문 아래 줄간격 여유 때문에 같은 값이면 여전히 아래로 쏠린다 */
+  padding: calc(var(--hero-pad) + clamp(39px, 3.8vw, 50px) - 20px) var(--gutter) calc(var(--hero-pad) + 20px);
+  text-align: center;
+}
+.ahero__title {
+  margin: 0;
+  font-size: clamp(36px, 5.4vw, 76px); line-height: 1.1; letter-spacing: 0; font-weight: 700;
+  text-wrap: balance;
+}
+.ahero__lead {
+  margin: clamp(22px, 2.6vw, 32px) auto 0; max-width: 640px;
+  font-size: clamp(16px, 1.4vw, 20px); line-height: 1.6; font-weight: 500;
+  color: rgba(255,255,255,.86); text-wrap: balance;
+}
+
+
+/* ============ 앱 구획 ============ */
+
+.app { background: #fff; }
+.app--tint { background: #f6f7f7; }
+/* 01 은 오른쪽 사진 열이 화면 끝까지 흘러넘친다 */
+.app--bleed { overflow: hidden; }
+
+.app__inner { display: flex; flex-wrap: wrap; align-items: stretch; }
+/* 02·03 은 평범한 --pagew 상자 */
+.app__inner--boxed {
+  max-width: var(--pagew); margin: 0 auto;
+  padding: clamp(80px, 9vw, 120px) var(--gutter);
+  align-items: center; gap: clamp(40px, 5vw, 80px);
+}
+
+.app__txt { flex: 1 1 420px; min-width: 0; }
+/* 01 의 글 열 — 오른쪽 사진이 화면 끝까지 가므로 왼쪽 여백을 --pagew 격자에 맞춘다 */
+.app__txt--gutter {
+  align-self: center;
+  /* 왼쪽만 --pagew 격자에 맞춘다. 56px 는 --gutter 의 최대값 — 화면이 넓어지면
+     격자 바깥 여백이 커지므로 그쪽 계산이 이긴다. 둘은 같이 움직여야 한다. */
+  padding: clamp(48px, 6vw, 72px) var(--gutter) clamp(48px, 6vw, 72px)
+           max(var(--gutter), calc((100vw - var(--pagew)) / 2 + 56px));
+}
+
+.app__badges { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.app__pill {
+  font-size: 12.5px; font-weight: 700; color: #fff;
+  background: var(--ink); padding: 6px 12px; border-radius: 999px;
+}
+.app__cat { font-size: 14px; font-weight: 600; color: var(--teal); }
+/* 라벨 → 제목 → 소개 → 목록 → 출시일 간격 — 제목·소개는 008 'A 균형형', 목록·출시일 위는 009 인라인값. 세 구획 공통 */
+.app__title {
+  margin: clamp(14px, 1.4vw, 18px) 0 0;
+  font-size: clamp(30px, 3.6vw, 48px); line-height: 1.25; letter-spacing: -.04em; font-weight: 700;
+  text-wrap: balance;
+}
+.app__sub {
+  margin: clamp(12px, 1.2vw, 16px) 0 0; max-width: 480px;
+  font-size: clamp(17px, 1.5vw, 20px); line-height: 1.55; letter-spacing: -.025em; font-weight: 600;
+  color: #3a3d42; text-wrap: pretty;
+}
+.app__sub--keep { word-break: keep-all; }
+.app__date { margin: clamp(32px, 3.2vw, 44px) 0 0; font-size: 15px; font-weight: 700; color: var(--ink); }
+
+
+/* ---- 01 의 3단계 ---- */
+
+.app__steps {
+  position: relative;
+  margin: clamp(36px, 3.6vw, 48px) 0 0; max-width: 480px;
+  display: grid; gap: clamp(22px, 2.6vw, 32px);
+}
+/* 번호 동그라미(44px)의 가운데를 지나는 세로선 */
+.app__steps-line {
+  position: absolute; left: 21px; top: 22px; bottom: 22px; width: 2px;
+  background: linear-gradient(var(--teal), rgba(0,144,140,.15));
+}
+.app__step {
+  position: relative;
+  display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; align-items: start;
+  cursor: default;
+}
+.app__stepno {
+  position: relative; z-index: 1;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid var(--teal); background: #fff; color: var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+  transition: background .3s ease, color .3s ease, transform .3s ease;
+}
+.app__step.is-on .app__stepno { background: var(--teal); color: #fff; transform: scale(1.06); }
+.app__stepbody { min-width: 0; padding-top: 2px; }
+.app__stepttl { margin: 0; font-size: clamp(19px, 1.7vw, 22px); font-weight: 700; letter-spacing: -.03em; }
+.app__steptxt { margin: 6px 0 0; font-size: 15.5px; line-height: 1.6; color: var(--muted); text-wrap: pretty; }
+
+
+/* ---- 01 의 기울인 사진 열 ---- */
+
+.app__shots {
+  position: relative; flex: 1 1 440px; min-width: 0;
+  min-height: clamp(460px, 46vw, 600px); overflow: hidden;
+  /* 왼쪽과 위아래를 부드럽게 지운다. 두 마스크를 교집합으로 겹친다 */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%),
+                     linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-composite: source-in;
+          mask-image: linear-gradient(to right, transparent, #000 12%),
+                      linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+          mask-composite: intersect;
+}
+.app__shots-stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 150%; height: 170%;
+  transform: translate(-50%, -50%) rotate(15deg);
+  display: flex; justify-content: center; gap: clamp(14px, 1.6vw, 22px);
+}
+.app__col { flex: 0 0 clamp(130px, 13vw, 180px); overflow: visible; }
+.app__track {
+  display: flex; flex-direction: column; gap: clamp(14px, 1.6vw, 22px);
+  will-change: transform;
+}
+/* 화면 한 장. 목록을 두 번 넣어 두고 절반만 흘린 뒤 되감는다 */
+.app__track > span {
+  display: block; width: 100%; aspect-ratio: 390/844;
+  border-radius: 18px;
+  background-color: #fff; background-position: center; background-size: cover; background-repeat: no-repeat;
+  box-shadow: 0 18px 36px rgba(15,23,42,.14), 0 2px 6px rgba(15,23,42,.06);
+}
+
+
+/* ---- 02 쌤핏 — 고정 높이 + 휴대폰 두 대 ---- */
+
+/* 휴대폰 상자 크기가 구획 높이에서 나온다 — 그래서 높이를 박는다 */
+.app--fixed { overflow: hidden; height: clamp(560px, 46vw, 680px); }
+.app__inner--snug {
+  height: 100%; flex-wrap: nowrap;
+  padding-top: clamp(40px, 4vw, 56px); padding-bottom: clamp(40px, 4vw, 56px);
+  gap: clamp(24px, 4vw, 80px);
+}
+.app__inner--snug > .app__txt { flex: 1 1 0; }
+
+/* 아코디언 — 고른 항목만 진하게, 설명은 grid-template-rows 0fr→1fr 로 펼친다.
+   한 번에 하나만 열려 있어 구획 높이가 흔들리지 않는다 */
+.app__acc {
+  margin: clamp(36px, 3.6vw, 48px) 0 0; max-width: 480px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.app__acc-item {
+  all: unset; cursor: pointer;
+  display: flex; flex-direction: column;
+  padding: clamp(10px, 1.1vw, 14px) 0;
+}
+.app__acc-item:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; border-radius: 4px; }
+.app__acc-ttl {
+  font-size: clamp(18px, 1.6vw, 21px); letter-spacing: -.035em; line-height: 1.4;
+  font-weight: 600; color: #a3a6ab;
+  transition: color .3s cubic-bezier(.22,1,.36,1);
+}
+.app__acc-wrap {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows .4s cubic-bezier(.22,1,.36,1);
+}
+.app__acc-wrap > span { overflow: hidden; min-height: 0; }
+.app__acc-txt {
+  display: block; padding-top: 8px;
+  font-size: clamp(14px, 1.15vw, 15px); font-weight: 500; letter-spacing: -.015em; line-height: 1.6;
+  color: #6b6e74; text-wrap: pretty; word-break: keep-all;
+  opacity: 0; transition: opacity .4s cubic-bezier(.22,1,.36,1);
+}
+.app__acc-item.is-on .app__acc-ttl { font-weight: 700; color: var(--ink); }
+.app__acc-item.is-on .app__acc-wrap { grid-template-rows: 1fr; }
+.app__acc-item.is-on .app__acc-txt { opacity: 1; }
+
+/* 상자 비율 510:539, 높이는 구획 안쪽 높이에 맞춘다. 원본은 오른쪽으로 150px 밀고
+   B 를 그만큼 되돌려 놓는다. 다만 --pagew 가 원본(1280)보다 넓어 그대로 밀면
+   1440 이하에서 A 가 화면 끝에 잘린다 — 격자 바깥 여백에서 A 가 상자 밖으로
+   삐져나오는 몫(약 48px)을 뺀 만큼만 민다. 넓은 화면에선 원본대로 150px. */
+.app__phones {
+  --outer: max(var(--gutter), calc((100vw - var(--pagew)) / 2 + var(--gutter)));
+  position: relative; left: clamp(0px, calc(var(--outer) - 48px), 150px);
+  flex: 0 0 auto; min-width: 0; margin-left: auto;
+  width: min(52%, calc((clamp(560px, 46vw, 680px) - 2 * clamp(40px, 4vw, 56px)) * .946));
+  aspect-ratio: 510 / 539;
+  cursor: pointer;
+}
+/* 호버 시 두 폰 사이에 번지는 빛. 위치·불투명도는 apps.js 가 넣는다 */
+.app__phones-glow {
+  position: absolute; left: 0; top: 0; z-index: 0;
+  width: 150%; height: 120%; transform: translate(-50%, -50%);
+  pointer-events: none; opacity: 0;
+  background: radial-gradient(closest-side, rgba(0,144,140,.20), rgba(79,222,216,.08) 55%, rgba(79,222,216,0) 100%);
+  filter: blur(24px);
+}
+.app__phone-a {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  transform-origin: 60% 45%;
+  /* apps.js 가 덮어쓰기 전, 그리고 모션이 꺼졌을 때의 자리 (원본 기본값) */
+  transform: translate(15px, -35px) scale(1.15);
+  filter: drop-shadow(-22px 30px 26px rgba(15,23,42,.14));
+}
+.app__phone-a-tilt { position: absolute; left: 22%; top: 8%; width: 76%; transform: rotate(-13deg); }
+.app__phone-a-tilt img { width: 100%; height: auto; display: block; }
+.app__phone-b {
+  position: absolute; left: calc(10% - 150px); top: 22%; z-index: 2;
+  width: 46%; height: auto; display: block;
+  transform-origin: 50% 50%;
+  transform: translate(40px, -15px) scale(1.2);
+  filter: drop-shadow(-26px 34px 30px rgba(15,23,42,.18));
+}
+
+
+/* ---- 03 대학어디가 — 기능 목록 + 3D 캐러셀 ---- */
+
+.app__feats { margin: clamp(36px, 3.6vw, 48px) 0 0; max-width: 480px; display: flex; flex-direction: column; }
+.app__feat {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: clamp(12px, 1.3vw, 16px) 0;
+  border-bottom: 1px solid #e6e6e3;
+}
+.app__feat:first-child { padding-top: 0; }
+.app__feat:last-child { padding-bottom: 0; border-bottom: 0; }
+.app__feat-ttl {
+  margin: 0; font-size: clamp(16px, 1.4vw, 18px); font-weight: 600; letter-spacing: -.025em; line-height: 1.4; color: var(--ink);
+  transition: color .3s cubic-bezier(.22,1,.36,1);
+}
+/* 항목 줄 어디에 올려도 제목이 메인 컬러로 — 제목 글자만 겨누기엔 너무 작다 */
+.app__feat:hover .app__feat-ttl { color: var(--teal); }
+.app__feat-txt {
+  margin: 0; font-size: clamp(13.5px, 1.1vw, 14.5px); font-weight: 500; letter-spacing: -.015em; line-height: 1.5;
+  color: #7a7d83; text-wrap: pretty; word-break: keep-all;
+}
+
+/* 구획 아래 여백까지 내려가 폰이 바닥에서 잘리게 둔다(원본 margin-bottom 음수).
+   오른쪽으로 미는 양은 02 와 같은 규칙 — 원본 150px, 좁으면 줄인다 */
+.app__car {
+  --pad: clamp(40px, 4vw, 56px);
+  --outer: max(var(--gutter), calc((100vw - var(--pagew)) / 2 + var(--gutter)));
+  position: relative; left: clamp(0px, calc(var(--outer) - 48px), 150px);
+  flex: 0 0 auto; min-width: 0; margin-left: auto;
+  align-self: stretch; margin-bottom: calc(-1 * var(--pad));
+  width: min(52%, calc((clamp(560px, 46vw, 680px) - 2 * var(--pad)) * 1.25));
+}
+.app__car-stage {
+  position: relative; width: 100%; height: 100%; perspective: 1600px;
+  /* 화면 전환 이징 — 원본(.8s expo-out)은 출발이 급해 날카롭다. 감쇠 스프링(ζ 0.78, ω 10)으로
+     부드럽게 출발해 2%만 살짝 넘쳤다가 자리 잡는다. linear() 를 모르는 브라우저는 비슷한 베지어.
+     (ζ 0.6 → 9% 넘침은 너무 세다는 피드백으로 낮춤) */
+  --car-dur: 1s;
+  --car-ease: cubic-bezier(.3, 1.06, .5, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  .app__car-stage {
+    --car-ease: linear(0, 0.027, 0.096, 0.189, 0.294, 0.401, 0.505, 0.6, 0.685, 0.759, 0.822, 0.873,
+      0.915, 0.947, 0.972, 0.99, 1.003, 1.011, 1.016, 1.019, 1.02, 1.019, 1.018, 1.016, 1.014, 1.012,
+      1.01, 1.008, 1.006, 1.005, 1.004, 1.003, 1.002, 1.001, 1.001, 1, 1, 1, 1, 1, 1);
+  }
+}
+/* 위치·크기·투명도는 apps.js 가 한 장씩 매긴다. 여기 값은 스크립트 전 기본 자리 */
+.app__car-phone {
+  position: absolute; left: 50%; top: calc(100px - var(--pad) + 55%);
+  height: 110%; aspect-ratio: 450 / 920;
+  padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform var(--car-dur) var(--car-ease), opacity .6s ease, filter .8s ease;
+  will-change: transform;
+}
+.app__car-phone > span {
+  position: absolute; inset: 0; display: block;
+  background-position: center; background-size: contain; background-repeat: no-repeat;
+  filter: drop-shadow(14px 24px 22px rgba(15,23,42,.16));
+}
+.app__car-phone:focus-visible { outline: 2px solid var(--teal); outline-offset: 6px; border-radius: 40px; }
+.app__car-dots {
+  position: absolute; left: 50%; top: calc(80px - var(--pad) - 30px); z-index: 20;
+  transform: translateX(-50%); display: flex; gap: 8px;
+}
+.app__car-dots button {
+  width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px;
+  background: #d6d8db; cursor: pointer;
+  /* 점도 같은 스프링으로 늘어난다 */
+  transition: width .7s var(--car-ease), background .4s ease;
+}
+/* 원본은 #0072A3(딥 블루 테마 색)을 박아 뒀지만 기본 테마는 민트라 민트로 맞춘다 */
+.app__car-dots button.is-on { width: 22px; background: var(--teal); }
+/* 보이는 점은 8px 이지만 누르는 영역은 위아래로 넓힌다 */
+.app__car-dots button { position: relative; }
+.app__car-dots button::after { content: ""; position: absolute; inset: -14px -4px; }
+
+
+/* ============ 푸터 — 메인(styles.css .ftr)과 같은 구성 ============ */
+
+.aftr { background: #fff; border-top: 1px solid var(--line); }
+.aftr__inner {
+  max-width: var(--pagew); margin: 0 auto;
+  padding: clamp(44px, 5vw, 68px) var(--gutter) clamp(36px, 4vw, 56px);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(28px, 4vw, 64px);
+}
+.aftr__col { min-width: 0; display: flex; flex-direction: column; gap: clamp(20px, 2.4vw, 30px); }
+.aftr__meta { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.aftr__meta p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--gray); }
+.aftr__copy { margin: 0; font-size: 12.5px; color: #a8abb1; }
+.aftr__brand { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-self: end; }
+.aftr__brand img { height: 26px; width: auto; display: block; }
+
+
+/* ============ 등장 ============
+   두 갈래다.
+   [data-rise] — 히어로 카피처럼 첫 화면에 늘 있는 것. (헤더는 다른 페이지와 같게 뺐다) CSS 애니메이션이라
+                 스크립트가 죽어도 보인다. --d 는 마크업에 박아 둔다.
+   [data-reveal] — 스크롤해서 만나는 것. apps.js 가 --d 를 매기고 .is-in 을 붙인다. */
+
+@keyframes app-rise {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: none; }
+}
+/* backwards — 지연 구간에만 시작값을 물고 있고 끝나면 손을 뗀다 */
+html.motion [data-rise] {
+  animation: app-rise 900ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms) backwards;
+}
+
+html.motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 900ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms),
+              transform 900ms cubic-bezier(.215,.61,.355,1) var(--d, 0ms);
+}
+html.motion [data-reveal].is-in { opacity: 1; transform: none; }
+
+
+/* ============ 좁은 화면 ============
+   원본에는 미디어쿼리가 없다. 열은 flex-wrap 이 접어 준다.
+   접힌 뒤 원본 값으로 어색해지는 곳만 잡는다. */
+
+@media (max-width: 900px) {
+  /* 접히면 글 열이 전폭이 된다 — 격자에 맞춘 왼쪽 여백은 의미가 없어진다 */
+  .app__txt--gutter { padding-left: var(--gutter); }
+  /* 기울인 사진 열은 접힌 뒤에도 제 높이를 갖도록 */
+  .app__shots { flex-basis: 100%; }
+
+  /* 02 는 원본이 nowrap 고정 높이라 좁으면 휴대폰이 글을 덮는다 — 세로로 쌓는다 */
+  .app--fixed { height: auto; }
+  .app__inner--snug { flex-wrap: wrap; padding-top: clamp(64px, 9vw, 96px); padding-bottom: clamp(48px, 7vw, 72px); }
+  .app__inner--snug > .app__txt { flex-basis: 100%; }
+  .app__phones { left: 0; width: min(100%, 520px); margin: 0 auto; }
+  .app__phone-b { left: 10%; }
+  /* 03 캐러셀은 구획 높이에 기대던 상자라, 쌓이면 제 높이를 준다 */
+  .app__car {
+    left: 0; width: 100%; align-self: auto;
+    height: clamp(440px, 115vw, 600px);
+    margin-bottom: calc(-1 * clamp(48px, 7vw, 72px));
+  }
+}
+
+/* 휴대폰(760px 미만) — 메인·회사소개·교육·시스템과 같은 경계·같은 헤더 메뉴·같은 크기와 간격.
+   위 900px 블록(세로로 쌓기)은 그대로 살리고, 그 위에 크기·간격만 얹는다.
+   759.98px 인 이유: 정확히 760px 에서 CSS 와 apps.js(narrowMq)가 서로 다른 편에 서지 않게 */
+@media (max-width: 759.98px) {
+  body { word-break: keep-all; overflow-wrap: break-word; }
+
+  /* ---- 헤더 → 전체 화면 메뉴 (메인과 같은 모양) ---- */
+  .hdr { --hdr-h: 84px; }   /* 2026-10-29: 76 → 84px, 로고 28 → 32px, 메뉴 단추 52 → 58px */
+  .hdr__brand img { height: 32px; }
+  .hdr__brand, .hdr__menu { position: relative; z-index: 2; }
+  /* 둥근 테두리 단추 안에 두 줄. 누르는 영역 58px, 보이는 원 54px */
+  .hdr__menu {
+    display: block; width: 58px; height: 58px; margin-right: -3px; padding: 0;
+    border: 0; background: none; cursor: pointer;
+    color: #fff; transition: color .3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hdr__menu::before {
+    content: ""; position: absolute; inset: 2px; border-radius: 999px;
+    border: 1px solid currentColor; opacity: .32;
+    transition: opacity .35s ease, border-color .35s ease, transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .hdr__menu:active::before { transform: scale(.92); }
+  .hdr__menu span {
+    position: absolute; left: 50%; top: 50%;
+    width: 22px; height: 2px; margin-left: -11px; border-radius: 2px; background: currentColor;
+    transition: transform .5s cubic-bezier(.65,0,.35,1), width .4s cubic-bezier(.22,1,.36,1), margin .4s cubic-bezier(.22,1,.36,1);
+  }
+  .hdr__menu span:first-child { transform: translateY(-5px); }
+  .hdr__menu span + span     { width: 14px; margin-left: -3px; transform: translateY(5px); }
+  .hdr.is-past .hdr__menu { color: var(--ink); }
+  .hdr.is-past .hdr__menu::before { opacity: .18; }
+
+  /* nav 자체가 메뉴판이 된다. 열리기 전에는 visibility 로 숨겨 탭 이동에도 잡히지 않는다 */
+  .hdr__nav {
+    position: fixed; inset: 0; z-index: 1;
+    flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px;
+    padding: 0 var(--gutter); background: #0d0f11; color: #fff;
+    opacity: 0; visibility: hidden;
+    transition: opacity .4s ease, visibility 0s linear .4s;
+    counter-reset: hnav;
+  }
+  .hdr__nav a {
+    display: flex; align-items: baseline; gap: 14px; padding: 8px 0;
+    font-size: clamp(30px, 9vw, 40px); font-weight: 800;
+    transform: translateY(18px); opacity: 0;
+    transition: transform .6s cubic-bezier(.22,1,.36,1), opacity .5s ease;
+    counter-increment: hnav;
+  }
+  .hdr__nav a::before {
+    content: "0" counter(hnav);
+    font-size: 13px; font-weight: 700; color: var(--mint); font-variant-numeric: tabular-nums;
+  }
+  .hdr__nav a.is-current { color: var(--mint); }
+  .hdr.is-past .hdr__nav { color: #fff; }
+
+  /* 열림 — 반투명 판·블러와 transform 을 걷는다. 남아 있으면 fixed 인 nav 가
+     화면이 아니라 헤더 띠 안에 갇힌다(.hdr 기본값이 translateY(0) 이다) */
+  .hdr.is-open { background: transparent; backdrop-filter: none; border-bottom-color: transparent; transform: none;
+                 transition: none; }   /* 블러·숨김이 서서히 풀리는 동안에도 nav 가 헤더 띠에 갇히므로 즉시 바꾼다 */
+  .hdr.is-open .hdr__brand img { filter: brightness(0) invert(1); }
+  .hdr.is-open .hdr__menu { color: #fff; }
+  .hdr.is-open .hdr__menu::before { opacity: 1; border-color: var(--mint); }
+  .hdr.is-open .hdr__menu span { width: 22px; margin-left: -11px; }
+  .hdr.is-open .hdr__menu span:first-child { transform: rotate(45deg); }
+  .hdr.is-open .hdr__menu span + span     { transform: rotate(-45deg); }
+  .hdr.is-open .hdr__nav { opacity: 1; visibility: visible; transition: opacity .4s ease; }
+  .hdr.is-open .hdr__nav a { transform: none; opacity: 1; }
+  .hdr.is-open .hdr__nav a:nth-child(1) { transition-delay: .08s; }
+  .hdr.is-open .hdr__nav a:nth-child(2) { transition-delay: .14s; }
+  .hdr.is-open .hdr__nav a:nth-child(3) { transition-delay: .2s; }
+  .hdr.is-open .hdr__nav a:nth-child(4) { transition-delay: .26s; }
+  html.menu-open, html.menu-open body { overflow: hidden; }
+
+  /* ---- 히어로 — 한 화면, 카피는 가운데. 버블은 카피와 겹치지 않게 위아래 모서리로 ---- */
+  .ahero { min-height: 100svh; display: flex; align-items: center; }
+  .ahero__content { width: 100%; padding: calc(var(--hdr-h) + 40px) var(--gutter) 72px; }
+  .ahero__title { font-size: clamp(36px, 10.4vw, 46px); line-height: 1.22; }
+  .ahero__lead { margin-top: 24px; font-size: 18px; }
+  /* 버블은 넓은 화면보다 약 1.4배 (2026-10-29) */
+  .ahero__bub--1 { left: 7%;  top: 17%; width: 96px; height: 96px; font-size: 24px; }
+  .ahero__bub--3 { right: 8%; top: 22%; left: auto; width: 82px; height: 82px; font-size: 21px; }
+  .ahero__bub--2 { left: 6%;  top: auto; bottom: 9%; width: 116px; height: 116px; font-size: 23px; }
+  .ahero__bub--4 { right: 8%; top: auto; bottom: 16%; left: auto; width: 104px; height: 104px; font-size: 19px; }
+  .ahero__dots { height: 60%; right: -30%; }
+
+  /* ---- 앱 구획 공통 — 한 화면 이상 넉넉한 여백, 글씨는 크게 ---- */
+  .app__txt--gutter { padding: 128px var(--gutter) 48px; }
+  .app__inner--snug { padding-top: 128px; padding-bottom: 64px; gap: 56px; }
+  .app__pill { font-size: 13px; padding: 7px 13px; }
+  .app__cat { font-size: 15px; }
+  .app__title { margin-top: 18px; font-size: clamp(38px, 11vw, 46px); }
+  .app__sub { margin-top: 14px; font-size: 19px; line-height: 1.6; }
+  .app__date { margin-top: 48px; font-size: 17px; }
+
+  /* 01 세 단계 */
+  .app__steps { margin-top: 44px; gap: 36px; }
+  .app__step { grid-template-columns: 48px minmax(0, 1fr); gap: 18px; }
+  .app__stepno { width: 48px; height: 48px; font-size: 15px; }
+  .app__steps-line { left: 23px; top: 24px; bottom: 24px; }
+  .app__stepbody { padding-top: 4px; }
+  .app__stepttl { font-size: 22px; }
+  .app__steptxt { margin-top: 8px; font-size: 17px; }
+  /* 기울인 사진 열 — 더 크게 (2026-10-29: 560 → 680px).
+     마스크는 투명으로 지워 흰 바탕이 비치는데, 휴대폰에서는 바로 아래가 회색 쌤핏 구획이라
+     아래 흐림이 흰 띠로 튀어나와 보였다. 마스크 대신 덮개 그라데이션을 얹어
+     위·왼쪽은 흰색으로, 아래는 다음 구획의 회색으로 녹인다 */
+  .app__shots {
+    min-height: 680px;
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+  .app__shots::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(to bottom, #fff, rgba(255,255,255,0) 8%),
+      linear-gradient(to top, #f6f7f7, rgba(246,247,247,0) 12%),
+      linear-gradient(to right, #fff, rgba(255,255,255,0) 10%);
+  }
+  .app__col { flex-basis: 150px; }
+
+  /* 02 아코디언 — 손가락으로 누른다. 항목 사이를 넓힌다 */
+  .app__acc { margin-top: 40px; gap: 6px; }
+  .app__acc-item { padding: 14px 0; }
+  .app__acc-ttl { font-size: 23px; }
+  .app__acc-txt { padding-top: 10px; font-size: 17px; }
+  /* 02 휴대폰 두 대 — 화면 폭 끝까지 쓰고 세로로 길게. 넓은 화면처럼 포개 두면
+     휴대폰에선 두 대가 거의 한 덩어리로 보여서, 뒤 폰은 왼쪽 아래, 앞 폰은 오른쪽 위로
+     벌려 모서리만 살짝 겹치게 한다. 덧붙이는 이동·확대는 apps.js 가 좁은 화면에서 끈다 */
+  .app__phones {
+    left: 0; width: 100vw; max-width: none;
+    margin: 0 calc(-1 * var(--gutter));
+    aspect-ratio: 1 / 1.14;
+  }
+  .app__phone-b { left: 2%; top: 15%; width: 58%; transform: none; }
+  .app__phone-a { transform: none; }
+  .app__phone-a-tilt { left: 22%; top: -6%; width: 88%; }
+
+  /* 03 기능 목록 */
+  .app__feats { margin-top: 40px; }
+  .app__feat { gap: 6px; padding: 20px 0; }
+  .app__feat-ttl { font-size: 21px; }
+  .app__feat-txt { font-size: 16.5px; line-height: 1.6; }
+  .app__car { height: clamp(460px, 124vw, 590px); margin-top: 8px; }   /* 2026-10-29: 약 8% 줄임 (135vw → 124vw) */
+
+  /* ---- 푸터 — 메인 모바일과 같은 정리(로고 위, 회사·주소·연락 이름표) ---- */
+  .aftr__inner { display: flex; flex-direction: column; gap: 20px; padding-top: 48px; padding-bottom: 40px; }
+  .aftr__brand { order: -1; }
+  .aftr__brand img { height: 28px; }
+  .aftr__col { gap: 0; }
+  .aftr__meta { flex-direction: column; gap: 0; }
+  .aftr__meta p { position: relative; padding-left: 52px; font-size: 14.5px; line-height: 1.8; color: var(--muted); }
+  .aftr__meta p::before {
+    position: absolute; left: 0; top: 0;
+    font-size: 13px; font-weight: 700; color: var(--ink);
+  }
+  .aftr__meta:first-child p:first-child::before { content: "회사"; }
+  .aftr__meta + .aftr__meta { margin-top: 10px; }
+  .aftr__meta + .aftr__meta p:first-child::before { content: "주소"; }
+  .aftr__meta + .aftr__meta p:nth-child(2) { margin-top: 10px; }
+  .aftr__meta + .aftr__meta p:nth-child(2)::before { content: "연락"; }
+  .aftr__copy { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; }
+}
+
+@media (max-width: 759.98px) and (prefers-reduced-motion: reduce) {
+  .hdr__nav, .hdr__nav a, .hdr__menu span { transition: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  /* 리빌은 html.motion 이 안 붙어 이미 꺼진다.
+     사진 흐름과 불빛 깜빡임은 apps.js 가 아예 걸지 않는다. */
+  .ahero__bub { transition: none; }
+}

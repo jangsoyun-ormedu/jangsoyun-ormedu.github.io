@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시스템 — (주)오름에듀테크</title>
+<meta name="description" content="오름에듀테크의 시스템 사업 — LMS 시스템 개발, 셀공 자기주도학습 관리 플랫폼, AI 기반 코스웨어, 멘토링 시스템을 직접 설계하고 구축합니다.">
+<script>
+  // 모션 가능한 환경에서만 등장 전 숨김 상태를 켬 — 첫 페인트 전에 적용해 깜빡임 방지.
+  if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.documentElement.classList.add("motion");
+  }
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="system.css">
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <div class="hdr__inner">
+    <a href="index.html" class="hdr__brand">
+      <img src="assets/logo.png" alt="오름에듀테크">
+    </a>
+    <!-- 좁은 화면(760px 미만)에서는 같은 nav 가 전체 화면 메뉴가 되고, 이 버튼이 연다 (메인과 같은 구조) -->
+    <nav class="hdr__nav" id="hdrNav">
+      <a href="history.html">회사소개</a>
+      <a href="education.html">교육</a>
+      <a href="#lms" class="is-current" aria-current="page">시스템</a>
+      <a href="apps.html">앱</a>
+    </nav>
+    <button type="button" class="hdr__menu" id="hdrMenu" aria-controls="hdrNav" aria-expanded="false" aria-label="메뉴 열기">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- 섹션 바로가기 (011) — 동작은 system.js setupSideNav -->
+<nav class="snav" data-snav aria-label="섹션 바로가기">
+  <a href="#lms"><span class="snav__no">01</span><span class="snav__label">LMS 시스템 개발</span></a>
+  <a href="#selgong"><span class="snav__no">02</span><span class="snav__label">셀공 시스템 개발</span></a>
+  <a href="#courseware"><span class="snav__no">03</span><span class="snav__label">AI 기반 코스웨어</span></a>
+  <a href="#mentoring-system"><span class="snav__no">04</span><span class="snav__label">멘토링 시스템 개발</span></a>
+</nav>
+
+<!-- ============ HERO — 고정 배경 패럴랙스 ============
+     .shero 에 걸린 clip-path:inset(0) 이 이 상자를 고정 자식의 기준 블록으로 만든다.
+     그래서 안쪽 레이어가 뷰포트가 아니라 이 상자에 맞춰 잘리고, 상자보다 크게 잡아 둔
+     레이어 안에서 사진만 천천히 흐른다. -->
+<section class="shero" id="sheroBox">
+  <div class="shero__layer">
+    <div class="shero__img" id="sheroImg">
+      <img src="assets/sys-hero-library.jpg" alt="도서관 책상에서 공부하는 학생들" fetchpriority="high" decoding="async">
+    </div>
+  </div>
+  <div class="shero__scrim" aria-hidden="true"></div>
+  <div class="shero__content">
+    <p class="shero__lead">맞춤형 교육 콘텐츠를 개발 및 제공하며, <br>특화된 프로그램을 통해 교육 혁신을 선도합니다</p>
+    <p class="shero__title">Learning<br>Systems</p>
+  </div>
+</section>
+
+<!-- ============ 01 LMS 시스템 개발 ============ -->
+<section id="lms" class="sec sec--first">
+  <div class="sec__head">
+    <div class="sec__headline" data-reveal>
+      <span class="sec__no">01</span>
+      <h2 class="sec__title">LMS<br>시스템 개발</h2>
+    </div>
+    <p class="sec__lead" data-reveal>콘텐츠 운영부터 학습 진단, 진도 관리, 성과 분석까지 교육 전 과정을 하나로 지원하는 디지털 학습 플랫폼을 구축합니다.</p>
+  </div>
+
+  <div class="sec__row sec__row--lead">
+    <div class="sec__fig" data-reveal>
+      <img src="assets/slots/sys-lms-1-new-1080.jpg" style="object-position:50% 0%" alt="교육 플랫폼의 추천강의 목록 화면" loading="lazy" decoding="async">
+    </div>
+    <div class="sec__txt">
+      <h3 class="sec__h3" data-reveal>사용자별 맞춤 설계</h3>
+      <ol class="sec__flow" data-reveal>
+        <li><span class="sec__flowno">ADMIN</span><span class="sec__flowname">관리자</span><span class="sec__flowsub">운영 현황 · 성과 분석</span></li>
+        <li><span class="sec__flowno">TEACHER</span><span class="sec__flowname">강사</span><span class="sec__flowsub">진도 관리 · 피드백</span></li>
+        <li><span class="sec__flowno">LEARNER</span><span class="sec__flowname">학습자</span><span class="sec__flowsub">학습 진단 · 콘텐츠</span></li>
+      </ol>
+      <p class="sec__body sec__body--after" data-reveal>기관의 교육 목표와 프로그램 특성을 반영하여 기능을 기획하고, 사용자별 흐름을 고려한 UI/UX를 설계합니다.</p>
+      <p class="sec__body" data-reveal>학습 데이터 기반의 분석 체계를 구축하여 학습 현황을 실시간으로 파악하고, 맞춤형 피드백과 운영 전략 수립이 가능하도록 지원합니다.</p>
+    </div>
+  </div>
+
+  <div class="sec__row">
+    <div class="sec__fig sec__fig--right" data-reveal>
+      <img src="assets/slots/sys-lms-2-new-1080.jpg" style="object-position:50% 0%" alt="진로 멘토링 수업 과정 상세 화면" loading="lazy" decoding="async">
+    </div>
+    <div class="sec__txt">
+      <h3 class="sec__h3" data-reveal>연계와 안정적 운영</h3>
+      <div class="sec__table" data-reveal>
+        <div class="sec__trow"><span class="sec__tk">콘텐츠 연계</span><span class="sec__tv">EBS · 온라인 교육 자료</span></div>
+        <div class="sec__trow"><span class="sec__tk">운영 지원</span><span class="sec__tv">사용자 매뉴얼 · 운영 가이드</span></div>
+      </div>
+      <p class="sec__body sec__body--after" data-reveal>다양한 교육 자료와의 연계를 통해 확장성 있는 학습 환경을 제공하며, 사용자 매뉴얼 및 운영 가이드 제작까지 포함한 안정적인 시스템 운영 체계를 구축합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 셀공 시스템 개발 ============ -->
+<section id="selgong" class="sec">
+  <div class="sec__head">
+    <div class="sec__headline" data-reveal>
+      <span class="sec__no">02</span>
+      <h2 class="sec__title">셀공<br>시스템 개발</h2>
+    </div>
+    <p class="sec__lead" data-reveal>데이터로 관리하고, 상담으로 완성하는 자기주도학습 관리 플랫폼입니다.</p>
+  </div>
+
+  <div class="sec__row sec__row--lead">
+    <div class="sec__fig" data-reveal>
+      <img src="assets/slots/sys-selgong-1-new-1080.jpg" style="object-position:50% 0%" alt="EBS 자기주도학습센터 셀공 시스템 대시보드 화면" loading="lazy" decoding="async">
+    </div>
+    <div class="sec__txt">
+      <p class="sec__body" data-reveal>셀공 시스템은 자기주도학습센터의 운영 전반을 통합 관리하는 학습 데이터 기반 운영·관리 시스템입니다.</p>
+      <p class="sec__body" data-reveal>학생의 학습, 상담, 출결, 진단평가까지 모든 과정을 하나로 연결하여 자기주도학습 선순환 구조를 구현합니다.</p>
+      <ol class="sec__flow sec__flow--4 sec__flow--after" data-reveal>
+        <li><span class="sec__flowno">STEP 1</span><span class="sec__flowname">정확한 진단</span></li>
+        <li><span class="sec__flowno">STEP 2</span><span class="sec__flowname">맞춤 설계</span></li>
+        <li><span class="sec__flowno">STEP 3</span><span class="sec__flowname">지속 관리</span></li>
+        <li><span class="sec__flowno">STEP 4</span><span class="sec__flowname">성과 분석</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 AI 기반 코스웨어 ============ -->
+<section id="courseware" class="sec">
+  <div class="sec__head">
+    <div class="sec__headline" data-reveal>
+      <span class="sec__no">03</span>
+      <h2 class="sec__title">AI 기반<br>코스웨어</h2>
+    </div>
+    <p class="sec__lead" data-reveal>오름에듀테크의 AI 코스웨어는 학생이 AI를 단순히 사용하는 수준을 넘어, 직접 설계하고 활용하는 경험을 제공하는 프로젝트 기반(PBL) 디지털 학습 솔루션입니다.</p>
+  </div>
+
+  <div class="sec__row sec__row--lead">
+    <div class="sec__fig" data-reveal>
+      <img src="assets/slots/sys-ai-1-v3-1080.jpg" style="object-position:50% 0%" alt="AI 코스웨어 1차시 AI 리터러시 자기 진단 화면" loading="lazy" decoding="async">
+    </div>
+    <div class="sec__txt">
+      <h3 class="sec__h3" data-reveal>함께 쓰는 통합 학습 환경</h3>
+      <ol class="sec__flow" data-reveal>
+        <li><span class="sec__flowno">LEARNER</span><span class="sec__flowname">학생</span><span class="sec__flowsub">결과물 · 포트폴리오</span></li>
+        <li><span class="sec__flowno">TEACHER</span><span class="sec__flowname">강사</span><span class="sec__flowsub">실시간 모니터링 · 피드백</span></li>
+        <li><span class="sec__flowno">ADMIN</span><span class="sec__flowname">관리자</span><span class="sec__flowsub">운영 현황 · 성과 데이터</span></li>
+      </ol>
+      <p class="sec__body sec__body--after" data-reveal>학생·강사·관리자가 하나의 플랫폼에서 프로젝트 활동부터 피드백, 운영 관리까지 함께 이어갑니다.</p>
+    </div>
+  </div>
+
+  <div class="sec__row">
+    <div class="sec__fig sec__fig--right" data-reveal>
+      <img src="assets/slots/sys-ai-2-v3-1080.jpg" style="object-position:50% 0%" alt="디지털새싹 시스템 관리자 콘텐츠 풀 관리 화면" loading="lazy" decoding="async">
+    </div>
+    <div class="sec__txt">
+      <h3 class="sec__h3" data-reveal>자동으로 쌓이는 성장 기록</h3>
+      <p class="sec__body sec__body--h3" data-reveal>학습 전·중·후 전 과정의 데이터를 기반으로 학습자의 성장과 역량 변화를 체계적으로 기록하며, 생성된 모든 활동은 자동으로 누적되어 개인별 성장 이력과 포트폴리오로 확장됩니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 멘토링 시스템 (012, 013 에서 제목·리드 변경) ============ -->
+<section id="mentoring-system" class="sec">
+  <div class="sec__head">
+    <div class="sec__headline" data-reveal>
+      <span class="sec__no">04</span>
+      <h2 class="sec__title">멘토링 시스템</h2>
+    </div>
+    <p class="sec__lead" data-reveal>멘토링 사업의 운영 전 과정을 하나로 관리하는 시스템으로, <br>멘토·멘티 매칭부터 활동 기록, 사업별 운영 설정까지 제공합니다.</p>
+  </div>
+
+  <div class="sec__row sec__row--lead">
+    <div class="sec__fig" data-reveal>
+      <img src="assets/slots/sys-mentor-1-v3-1080.jpg" style="object-position:50% 0%" alt="교육 멘토링 관리자 대시보드 화면" loading="lazy" decoding="async">
+    </div>
+    <div class="sec__txt">
+      <h3 class="sec__h3" data-reveal>매칭부터 기록까지</h3>
+      <ol class="sec__flow" data-reveal>
+        <li><span class="sec__flowno">STEP 1</span><span class="sec__flowname">조건 설정</span><span class="sec__flowsub">과목 · 가능 시간</span></li>
+        <li><span class="sec__flowno">STEP 2</span><span class="sec__flowname">맞춤 매칭</span><span class="sec__flowsub">멘토 ↔ 멘티</span></li>
+        <li><span class="sec__flowno">STEP 3</span><span class="sec__flowname">회차별 기록</span><span class="sec__flowsub">활동보고서</span></li>
+      </ol>
+      <p class="sec__body sec__body--after" data-reveal>과목, 가능 시간 등 멘토와 멘티의 조건을 세부적으로 설정하고, 이를 바탕으로 서로에게 꼭 맞는 멘토와 멘티를 매칭합니다.</p>
+      <p class="sec__body" data-reveal>매 회차가 끝나면 활동보고서를 작성해 멘토링 과정 전체를 체계적으로 기록·관리합니다.</p>
+    </div>
+  </div>
+
+  <div class="sec__row">
+    <div class="sec__fig sec__fig--right" data-reveal>
+      <img src="assets/slots/sys-mentor-2-new-1080.jpg" style="object-position:50% 0%" alt="멘토·멘티 매칭관리 화면" loading="lazy" decoding="async">
+    </div>
+    <div class="sec__txt">
+      <h3 class="sec__h3" data-reveal>사업마다 맞춤 운영</h3>
+      <div class="sec__table" data-reveal>
+        <div class="sec__trow"><span class="sec__tk">사업별 운영 설정</span><span class="sec__tv">신청 교재 · 비용 등</span></div>
+        <div class="sec__trow"><span class="sec__tk">AI 챗봇</span><span class="sec__tv">요청 사항 즉시 처리</span></div>
+      </div>
+      <p class="sec__body sec__body--after" data-reveal>신청 교재, 비용 등 사업마다 다른 운영 조건을 자유롭게 설정할 수 있어, 어떤 멘토링 사업이든 맞춤형으로 배포·운영할 수 있습니다.</p>
+      <p class="sec__body" data-reveal>또한 AI 챗봇을 통해 요청 사항을 바로 처리할 수 있어 운영 편의성을 높였습니다.</p>
+    </div>
+  </div>
+</section>
+<div class="sec__tail"></div>
+<footer class="sftr">
+  <div class="sftr__inner">
+    <div class="sftr__col">
+      <div class="sftr__meta">
+        <p>(주)오름에듀테크</p>
+        <p>대표이사 박성규</p>
+        <p>사업자등록번호 686-81-01781</p>
+      </div>
+      <div class="sftr__meta">
+        <p>서울특별시 서초구 서초중앙로 40-8 베스트원빌딩 2층</p>
+        <p>TEL 1555-7998</p>
+        <p>FAX 02-6949-2205</p>
+        <p>orm@ormedu.co.kr</p>
+      </div>
+      <p class="sftr__copy">© 2026 OREUM EDUTECH Corp.</p>
+    </div>
+    <div class="sftr__brand">
+      <img src="assets/logo.png" alt="오름에듀테크" loading="lazy">
+    </div>
+  </div>
+</footer>
+
+<script src="system.js"></script>
+</body>
+</html>
