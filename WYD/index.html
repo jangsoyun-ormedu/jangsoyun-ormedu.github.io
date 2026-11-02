@@ -2371,8 +2371,8 @@ class Component extends DCLogic {
             const hd = this.headerRef && this.headerRef.current;
             const links = e.currentTarget.parentElement;
             const hl = hd ? hd.getBoundingClientRect().left : 0, hw = hd ? hd.clientWidth : window.innerWidth;
-            const a = links.firstElementChild.getBoundingClientRect(), b = links.lastElementChild.getBoundingClientRect();
-            const w = Math.max(b.right - a.left, 320);
+            const a = links.firstElementChild.getBoundingClientRect();
+            const w = Math.min(480, hw - 32);
             const left = Math.max(16, Math.min(a.left - hl, hw - w - 16));
             if (this.state.megaOpen !== k || this.state.megaLeft !== left || this.state.megaW !== w) this.setState({ megaOpen: k, megaSub: this.state.megaOpen === k ? this.state.megaSub : 1, megaLeft: left, megaW: w });
           },
